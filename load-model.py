@@ -30,8 +30,8 @@ lr = 1e-3
 
 
 def plot(samples):
-    fig = plt.figure(figsize=(4, 4))
-    gs = gridspec.GridSpec(4, 4)
+    fig = plt.figure(figsize=(1, len(samples)))
+    gs = gridspec.GridSpec(1, len(samples))
     gs.update(wspace=0.05, hspace=0.05)
 
     for i, sample in enumerate(samples):
@@ -44,6 +44,21 @@ def plot(samples):
 
     return fig
 
+def img_attach(samples):
+    width = 20*(len(samples)-1)+28
+    result = np.zeros((28, width))
+    result.fill(1)
+    for idx, img in enumerate(samples):
+        img = img.reshape(28, 28)
+        if idx==0:
+            result[:,:28] = img
+        else:
+            for idx_i, val_i in enumerate(img):
+                for idx_j, val_j in enumerate(val_i):
+                    print(idx_j*idx +20)
+                    if img[idx_i, idx_j] < result[idx_i, idx_j*idx + 20]:
+                        result[idx_i, idx_j*idx + 20] = img[idx_i, idx_j]
+    return result
 
 def xavier_init(size):
     in_dim = size[0]
@@ -160,12 +175,22 @@ z_a = [float(f) for f in z_a]
 z_a = np.array(z_a)
 z_a = z_a.reshape(16, 100)
 
+tmp =np.zeros(100)
+for i in z_a:
+    tmp+=i
+z_a[0] = tmp[:]/16
+
 z_b = z_b[1:]
 z_b = z_b[:-1]
 z_b = z_b.split(" ")
 z_b = [float(f) for f in z_b]
 z_b = np.array(z_b)
 z_b = z_b.reshape(16, 100)
+
+tmp =np.zeros(100)
+for i in z_b:
+    tmp+=i
+z_b[0] = tmp[:]/16
 
 z_c = z_c[1:]
 z_c = z_c[:-1]
@@ -188,15 +213,42 @@ z_e = [float(f) for f in z_e]
 z_e = np.array(z_e)
 z_e = z_e.reshape(16, 100)
 
-y = np.zeros(shape=[16, y_dim])
-y[:, np.random.randint(0, y_dim)] = 1.
-'''print(z_a[0]-z_a[1])
-tmp =np.zeros(100)
-for i in z_a:
-    tmp+=i
-z_a[0] = tmp[8:]/16'''
-samples = sess_a.run(X_samples, feed_dict={z: z_a, c: y})
 
+# z값 그래프로 찍어보기
+'''y1_value = z_a[1]*100
+x_name=[i for i in range(100)]
+n_groups = len(x_name)
+index = np.arange(n_groups)
+
+plt.bar(index, y1_value, tick_label=x_name, align='center')
+
+plt.xlabel('month')
+plt.ylabel('average rainfall (mm)')
+plt.title('Weather Bar Chart')
+plt.xlim( -1, n_groups)
+plt.ylim( 0, 100)
+plt.show()
+'''
+
+
+
+
+y = np.zeros(shape=[1, y_dim])
+y[:, np.random.randint(0, y_dim)] = 1.
+
+samples = []
+a = input()
+
+for i in a:
+    if i=="a":
+        samples.append(sess_a.run(X_samples, feed_dict={z: z_a[0].reshape(1,100), c: y}))
+    if i=="b":
+        samples.append(sess_b.run(X_samples, feed_dict={z: z_b[0].reshape(1,100), c: y}))
+
+test = img_attach(samples)
+print(test)
+plt.imshow(test)
+plt.show()
 fig = plot(samples)
 plt.show()
 plt.close(fig)
