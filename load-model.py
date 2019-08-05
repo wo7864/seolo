@@ -45,20 +45,31 @@ def plot(samples):
     return fig
 
 def img_attach(samples):
-    width = 20*(len(samples)-1)+28
-    result = np.zeros((28, width))
+    img_size = 28
+    attach = 16  # 이미지를 붙이는 정도. 작을수록 글자 간의 간격이 좁아진다.
+    width = attach*(len(samples)-1)+img_size
+    result = np.zeros((img_size, width))
     result.fill(1)
     for idx, img in enumerate(samples):
-        img = img.reshape(28, 28)
+        img = img.reshape(img_size, img_size)
         if idx==0:
-            result[:,:28] = img
+            result[:,:img_size] = img
         else:
             for idx_i, val_i in enumerate(img):
                 for idx_j, val_j in enumerate(val_i):
-                    print(idx_j*idx +20)
-                    if img[idx_i, idx_j] < result[idx_i, idx_j*idx + 20]:
-                        result[idx_i, idx_j*idx + 20] = img[idx_i, idx_j]
-    return result
+                    if img[idx_i, idx_j] < result[idx_i, attach*idx + idx_j]:
+                        result[idx_i, attach*idx + idx_j] = img[idx_i, idx_j]
+
+    fig = plt.figure(figsize=(1, 1))
+    gs = gridspec.GridSpec(1, 1)
+    gs.update(wspace=0.05, hspace=0.05)
+    ax = plt.subplot(gs[0])
+    plt.axis('off')
+    ax.set_xticklabels([])
+    ax.set_yticklabels([])
+    ax.set_aspect('equal')
+    plt.imshow(result.reshape(img_size, width), cmap='Greys_r')
+    return fig
 
 def xavier_init(size):
     in_dim = size[0]
@@ -131,87 +142,30 @@ def P(z, c):
 
 X_samples, _ = P(z, c)
 
-sess_a = tf.Session()
-sess_a.run(tf.global_variables_initializer())
-
-sess_b = tf.Session()
-sess_b.run(tf.global_variables_initializer())
-
-saver_a = tf.train.Saver()
-saver_b = tf.train.Saver()
-# saver_c=tf.train.Saver()
-# saver_d=tf.train.Saver()
-# saver_e=tf.train.Saver()
-
-
 model_dir = './model/'
-saver_a.restore(sess_a, model_dir + 'A/A.ckpt')
-saver_b.restore(sess_b, model_dir + 'B/B.ckpt')
-# saver_c.restore(sess, model_dir+'C/C.ckpt')
-# saver_d.restore(sess, model_dir+'D/D.ckpt')
-# saver_e.restore(sess, model_dir+'E/E.ckpt')
+sess_list = []
+saver_list = []
+model_list = ['A', 'B', 'C', 'D', 'E']
+z_list = []
 
-z_a = ""
-z_b = ""
-z_c = ""
-z_d = ""
-z_e = ""
+for i in range(5):
+    sess_list.append(tf.Session())
+    saver_list.append(tf.train.Saver())
 
-with open("./z_value/A.txt", "r") as f:
-    z_a = f.read().replace("\n", "").replace("[", " ").replace("]", " ").replace("  ", " ").replace("  ", " ")
-with open("./z_value/B.txt", "r") as f:
-    z_b = f.read().replace("\n", "").replace("[", " ").replace("]", " ").replace("  ", " ").replace("  ", " ").replace("  ", " ")
-with open("./z_value/C.txt", "r") as f:
-    z_c = f.read().replace("\n", "").replace("[", " ").replace("]", " ").replace("  ", " ").replace("  ", " ")
-with open("./z_value/D.txt", "r") as f:
-    z_d = f.read().replace("\n", "").replace("[", " ").replace("]", " ").replace("  ", " ").replace("  ", " ")
-with open("./z_value/E.txt", "r") as f:
-    z_e = f.read().replace("\n", "").replace("[", " ").replace("]", " ").replace("  ", " ").replace("  ", " ")
+for idx, sess in enumerate(sess_list):
+    sess.run(tf.global_variables_initializer())
+    saver_list[idx].restore(sess, model_dir + '{}/{}.ckpt'.format(model_list[idx], model_list[idx]))
+    with open("./z_value/{}.txt".format(model_list[idx]), "r") as f:
+        z_value = f.read().replace("\n", "").replace("[", " ").replace("]", " ").replace("  ", " ").replace("  ", " ").replace("  ", " ")
+        z_value = z_value[1:-1].split(" ")
+        z_value = [float(f) for f in z_value]
+        z_value = np.array(z_value).reshape(16,100)
+        z_list.append(z_value)
 
-z_a = z_a[1:]
-z_a = z_a[:-1]
-z_a = z_a.split(" ")
-z_a = [float(f) for f in z_a]
-z_a = np.array(z_a)
-z_a = z_a.reshape(16, 100)
-
-tmp =np.zeros(100)
+'''tmp =np.zeros(100)
 for i in z_a:
     tmp+=i
-z_a[0] = tmp[:]/16
-
-z_b = z_b[1:]
-z_b = z_b[:-1]
-z_b = z_b.split(" ")
-z_b = [float(f) for f in z_b]
-z_b = np.array(z_b)
-z_b = z_b.reshape(16, 100)
-
-tmp =np.zeros(100)
-for i in z_b:
-    tmp+=i
-z_b[0] = tmp[:]/16
-
-z_c = z_c[1:]
-z_c = z_c[:-1]
-z_c = z_c.split(" ")
-z_c = [float(f) for f in z_c]
-z_c = np.array(z_c)
-z_c = z_c.reshape(16, 100)
-
-z_d = z_d[1:]
-z_d = z_d[:-1]
-z_d = z_d.split(" ")
-z_d = [float(f) for f in z_d]
-z_d = np.array(z_d)
-z_d = z_d.reshape(16, 100)
-
-z_e = z_e[1:]
-z_e = z_e[:-1]
-z_e = z_e.split(" ")
-z_e = [float(f) for f in z_e]
-z_e = np.array(z_e)
-z_e = z_e.reshape(16, 100)
+z_a[0] = tmp[:]/32'''
 
 
 # z값 그래프로 찍어보기
@@ -230,28 +184,31 @@ plt.ylim( 0, 100)
 plt.show()
 '''
 
-
-
-
 y = np.zeros(shape=[1, y_dim])
 y[:, np.random.randint(0, y_dim)] = 1.
 
 samples = []
 a = input()
+from random import *
 
 for i in a:
+    rand_num = randint(0, 15)
     if i=="a":
-        samples.append(sess_a.run(X_samples, feed_dict={z: z_a[0].reshape(1,100), c: y}))
-    if i=="b":
-        samples.append(sess_b.run(X_samples, feed_dict={z: z_b[0].reshape(1,100), c: y}))
+        samples.append(sess_list[0].run(X_samples, feed_dict={z: z_list[0][rand_num].reshape(1,100), c: y}))
+    elif i=="b":
+        samples.append(sess_list[1].run(X_samples, feed_dict={z: z_list[1][rand_num].reshape(1,100), c: y}))
+    elif i=="c":
+        samples.append(sess_list[2].run(X_samples, feed_dict={z: z_list[2][rand_num].reshape(1,100), c: y}))
+    elif i=="d":
+        samples.append(sess_list[3].run(X_samples, feed_dict={z: z_list[3][rand_num].reshape(1,100), c: y}))
+    elif i=="e":
+        samples.append(sess_list[4].run(X_samples, feed_dict={z: z_list[4][rand_num].reshape(1,100), c: y}))
 
 test = img_attach(samples)
-print(test)
-plt.imshow(test)
 plt.show()
-fig = plot(samples)
-plt.show()
-plt.close(fig)
+#fig = plot(samples)
+#plt.show()
+plt.close(test)
 
 '''samples = sess_b.run(X_samples, feed_dict={z: z_b, c: y})
 fig = plot(samples)
