@@ -35,6 +35,33 @@ def plot(samples):
 
     return fig
 
+def img_attach(samples):
+    img_size = 28
+    attach = 20  # 이미지를 붙이는 정도. 작을수록 글자 간의 간격이 좁아진다.
+    width = attach*(len(samples)-1)+img_size
+    result = np.zeros((img_size, width))
+    result.fill(0)
+    for idx, img in enumerate(samples):
+        img = img.reshape(img_size, img_size)
+        if idx==0:
+            result[:,:img_size] = img
+        else:
+            for idx_i, val_i in enumerate(img):
+                for idx_j, val_j in enumerate(val_i):
+                    if img[idx_i, idx_j] > result[idx_i, attach*idx + idx_j]:
+                        result[idx_i, attach*idx + idx_j] = img[idx_i, idx_j]
+
+    fig = plt.figure(figsize=(1, 1))
+    gs = gridspec.GridSpec(1, 1)
+    gs.update(wspace=0.05, hspace=0.05)
+    ax = plt.subplot(gs[0])
+    plt.axis('off')
+    ax.set_xticklabels([])
+    ax.set_yticklabels([])
+    ax.set_aspect('equal')
+    plt.imshow(result.reshape(img_size, width), cmap='Greys_r')
+    return fig
+
 def div2_draw(z,x1,x2,y1,y2):# 4개의 모양, 2개의 축을 이용하여 변화되는 모습을 그림
     x1 = z[x1]
     x2 = z[x2]
@@ -57,14 +84,27 @@ def div1_draw(z, x, y):
         z[i] = (x*one + y*ten)/(one+ten)
     return z
 
+alphabet = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']
+model_list = []
+z_list = []
+for i in alphabet:
+    model_list.append(load_model(i))
+    z_list.append(load_z(i))
 
-loaded_model = load_model("M")
-z = load_z("M")
 #z = div2_draw(z, 0,80, 65, 89)
-z = div1_draw(z, 0, 80)
-generated_images = loaded_model.predict(z)
+#z = div1_draw(z, 0, 80)
 
+input_text = input()
+generated_images = []
+from random import *
+
+for i in input_text:
+    rand_num = randint(0, 100)
+    idx = alphabet.index(i)
+    generated_images.append(model_list[idx].predict(z_list[idx])[rand_num])
+
+result = img_attach(generated_images)
+plt.show()
 fig = plot(generated_images)
 plt.show()
-
-plt.close(fig)
+plt.close(result)
