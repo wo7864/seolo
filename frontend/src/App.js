@@ -10,7 +10,6 @@ axios.defaults.xsrfHeaderName = "X-CSRFToken";
 
 class App extends Component {
   state = {
-    num : 50,
     value: "",
     textList: []
   };
