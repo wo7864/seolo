@@ -10,6 +10,7 @@ GAN을 활용한 손글씨 생성 프로젝트입니다.
 
 ### Data set
 Kaggle - A-Z Handwritten Alphabets in .csv format
+
 https://www.kaggle.com/sachinpatel21/az-handwritten-alphabets-in-csv-format
 
 ### create Model
