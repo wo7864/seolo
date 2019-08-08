@@ -22,27 +22,6 @@
     <title>React App</title>
   </head>
   <body>
-    <input type="submit" value="전송" onclick="button1_click();"><br>
-    <font size = 2 id = "slider_value_view">0</font>
-
-    <input oninput = 'ShowSliderValue(this.value)'  type = "range" min='0' max='100' value='0'>
-
-
-
-    <script language = "javascript">
-
-    function ShowSliderValue(sVal)
-    {
-    	var obValueView = document.getElementById("slider_value_view");
-    	obValueView.innerHTML = sVal
-    }
-
-    function button1_click() {
-      var obValueView = document.getElementById("slider_value_view");
-      alert(obValueView.innerHTML);
-    }
-
-    </script>
 
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>

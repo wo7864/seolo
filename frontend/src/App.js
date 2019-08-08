@@ -10,6 +10,7 @@ axios.defaults.xsrfHeaderName = "X-CSRFToken";
 
 class App extends Component {
   state = {
+    num : "50",
     value: "",
     textList: []
   };
@@ -22,6 +23,8 @@ class App extends Component {
     console.log(textList);
     return (
       <div className="App">
+      <input type="range" value={this.state.num}  onChange={this.handleChange}/>
+      <button onClick={this._handleSliderSubmit}>슬라이더 값 전송</button>
         <h1>OneLine App</h1>
         <div>
           <label>
@@ -49,8 +52,17 @@ class App extends Component {
       </div>
     );
   }
+  handleChange = event => {
+    this.setState({ num: event.target.value });
+  };
   _handleChange = event => {
     this.setState({ value: event.target.value });
+  };
+  _handleSliderSubmit = () => {
+    const { num } = this.state;
+    axios
+      .post("http://localhost:8000/api/wisesaying/", { text: num })
+      .then(res => this._renderText());
   };
   _handleSubmit = () => {
     const { value } = this.state;
