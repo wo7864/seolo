@@ -2,6 +2,8 @@ from keras.models import model_from_json
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
+from random import *
+import csv
 
 def load_z(target):
     with open("./z_value/{}.txt".format(target), "r") as f:
@@ -50,6 +52,7 @@ def img_attach(samples):
                 for idx_j, val_j in enumerate(val_i):
                     if img[idx_i, idx_j] > result[idx_i, attach*idx + idx_j]:
                         result[idx_i, attach*idx + idx_j] = img[idx_i, idx_j]
+    print(result[26,29])
 
     fig = plt.figure(figsize=(1, 1))
     gs = gridspec.GridSpec(1, 1)
@@ -84,6 +87,20 @@ def div1_draw(z, x, y):
         z[i] = (x*one + y*ten)/(one+ten)
     return z
 
+# 랜덤 출력 // 입력받은 문자열을 랜덤한 z_value로 출력한다.
+def random_generate():
+    input_text = input()
+    generated_images = []
+
+    for i in input_text:
+        rand_num = randint(0, 100)
+        idx = alphabet.index(i)
+        generated_images.append(model_list[idx].predict(z_list[idx])[rand_num])
+    return generated_images
+
+def set_parameter_generate(z, ):
+
+    return 0
 alphabet = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']
 model_list = []
 z_list = []
@@ -93,18 +110,32 @@ for i in alphabet:
 
 #z = div2_draw(z, 0,80, 65, 89)
 #z = div1_draw(z, 0, 80)
+#gererated_images = random_generate()
 
-input_text = input()
-generated_images = []
-from random import *
 
-for i in input_text:
-    rand_num = randint(0, 100)
-    idx = alphabet.index(i)
-    generated_images.append(model_list[idx].predict(z_list[idx])[rand_num])
+image_parameter = []
 
-result = img_attach(generated_images)
-plt.show()
-fig = plot(generated_images)
-plt.show()
-plt.close(result)
+f = open('alphabet_parameter.csv', 'r', encoding='utf-8')
+rdr = csv.reader(f)
+for line in rdr:
+    image_parameter.append(line)
+f.close()
+while(1):
+    input_text = input("출력할 텍스트를 입력해주세요: ")
+    param_1 = int(input("첫번째 파라미터를 입력해주세요(굵기): "))
+    param_2 = int(input("두번째 파라미터를 입력해주세요(기울기): "))
+    generated_images = []
+    for i in input_text:
+        idx = alphabet.index(i)
+        param = image_parameter[idx][1:]
+        param = list(map(int, param))
+        param_list = []
+        for j in param:
+            param_list.append(z_list[idx][j])
+        fin_z = (param_list[0]*(100-param_1) + param_list[1]*param_1 + param_list[2]*(100-param_2) + param_list[3]*param_2)/200
+        fin_z = np.array(list(fin_z)*100).reshape(100,100)
+        generated_images.append(model_list[idx].predict(fin_z)[0])
+
+    result = img_attach(generated_images)
+    plt.show()
+    plt.close(result)
