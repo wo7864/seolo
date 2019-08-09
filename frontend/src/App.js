@@ -23,7 +23,7 @@ class App extends Component {
     console.log(textList);
     return (
       <div className="App">
-      <input type="range" value={this.state.num}  onChange={this.handleChange}/>
+      <input type="range" value={this.state.num}  onChange={this._handleSliderChange}/>
       <button onClick={this._handleSliderSubmit}>슬라이더 값 전송</button>
         <h1>OneLine App</h1>
         <div>
@@ -32,10 +32,10 @@ class App extends Component {
             <input
               type="text"
               value={this.state.value}
-              onChange={this._handleChange}
+              onChange={this._handleTextChange}
             />
           </label>
-          <button onClick={this._handleSubmit}>submit</button>
+          <button onClick={this._handleTextSubmit}>submit</button>
         </div>
         <h2>Long Text</h2>
         {textList.map((text, index) => {
@@ -52,10 +52,10 @@ class App extends Component {
       </div>
     );
   }
-  handleChange = event => {
+  _handleSliderChange = event => {
     this.setState({ num: event.target.value });
   };
-  _handleChange = event => {
+  _handleTextChange = event => {
     this.setState({ value: event.target.value });
   };
   _handleSliderSubmit = () => {
@@ -64,7 +64,7 @@ class App extends Component {
       .post("http://localhost:8000/api/wisesaying/", { text: num })
       .then(res => this._renderText());
   };
-  _handleSubmit = () => {
+  _handleTextSubmit = () => {
     const { value } = this.state;
     axios
       .post("http://localhost:8000/api/wisesaying/", { text: value })
