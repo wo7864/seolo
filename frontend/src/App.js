@@ -2,8 +2,6 @@ import React, { Component } from "react";
 import "./App.css";
 import TextItem from "./TextItem";
 import axios from "axios";
-//이미지는 하나만 로드하고 새로 만들어지는걸 덮어씌우는 방식으로 해결할 수 있을듯
-import wj from './images/wj.jpg'
 
 axios.defaults.xsrfCookieName = "csrftoken";
 axios.defaults.xsrfHeaderName = "X-CSRFToken";
@@ -12,6 +10,7 @@ class App extends Component {
   state = {
     num : "50",
     value: "",
+    submit: "default",//제출된 텍스트를 담을 곳 , default 이미지가 존재해야함
     textList: []
   };
 
@@ -48,7 +47,7 @@ class App extends Component {
             />
           );
         })}
-        <img src={wj} alt="이미지자리"/>
+        <img src={require('./images/'+this.state.submit+'.jpg')} alt="이미지자리"/>
       </div>
     );
   }
@@ -66,6 +65,8 @@ class App extends Component {
   };
   _handleTextSubmit = () => {
     const { value } = this.state;
+    //텍스트 박스에 있는 내용을 value에 담고 그걸 this.state.submit에 넣어줌
+    this.setState({ submit:value });
     axios
       .post("http://localhost:8000/api/wisesaying/", { text: value })
       .then(res => this._renderText());
