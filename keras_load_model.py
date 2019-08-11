@@ -37,7 +37,7 @@ def plot(samples):
 
     return fig
 
-def img_attach(samples, attach=20):
+def img_attach(samples, attach=14):
     img_size = 28
     width = attach*(len(samples)-1)+img_size
     result = np.zeros((img_size, width))
@@ -100,34 +100,25 @@ def random_generate():
 def set_parameter_generate(z, ):
 
     return 0
-alphabet = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']
-model_list = []
-z_list = []
-for i in alphabet:
-    model_list.append(load_model(i))
-    z_list.append(load_z(i))
 
-#z = div2_draw(z, 0,80, 65, 89)
-#z = div1_draw(z, 0, 80)
-#gererated_images = random_generate()
+def excute(text, p1, p2, p3):
+    alphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
+                'V', 'W', 'X', 'Y', 'Z']
+    model_list = []
+    z_list = []
+    for i in alphabet:
+        model_list.append(load_model(i))
+        z_list.append(load_z(i))
+    image_parameter = []
 
+    f = open('alphabet_parameter.csv', 'r', encoding='utf-8')
+    rdr = csv.reader(f)
+    for line in rdr:
+        image_parameter.append(line)
+    f.close()
 
-image_parameter = []
-
-f = open('alphabet_parameter.csv', 'r', encoding='utf-8')
-rdr = csv.reader(f)
-for line in rdr:
-    image_parameter.append(line)
-f.close()
-
-
-while(1):
-    input_text = input("출력할 텍스트를 입력해주세요: ")
-    param_1 = int(input("첫번째 파라미터를 입력해주세요(굵기): "))
-    param_2 = int(input("두번째 파라미터를 입력해주세요(기울기): "))
-    param_3 = int(input("띄어쓰기 간격을 입력해주세요(1~5): "))
     generated_images = []
-    for i in input_text:
+    for i in text:
         if i == " ":
             tmp = np.zeros((28, 28))
             tmp.fill(0)
@@ -139,11 +130,12 @@ while(1):
             param_list = []
             for j in param:
                 param_list.append(z_list[idx][j])
-            fin_z = (param_list[0]*(100-param_1) + param_list[1]*param_1 + param_list[2]*(100-param_2) + param_list[3]*param_2)/200
-            fin_z = np.array(list(fin_z)*100).reshape(100,100)
-            generated_images.append(model_list[idx].predict(fin_z)[0])
+                fin_z = (param_list[0] * (100 - p1) + param_list[1] * p1 + param_list[2] * (100 - p2) + param_list[3] * p2) / 200
+                fin_z = np.array(list(fin_z) * 100).reshape(100, 100)
+                generated_images.append(model_list[idx].predict(fin_z)[0])
 
-    result = img_attach(generated_images)
-    plt.show()
+    result = img_attach(generated_images, p3)
+    plt.imsave(result, "{}_{}_{}_{}.png".format(text, p1, p2, p3))
     plt.close(result)
+
 
