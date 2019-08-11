@@ -47,6 +47,8 @@ class App extends Component {
             />
           );
         })}
+        <img src='https://www.valentinog.com/blog/wp-content/uploads/2018/03/django-rest-react@2x-1024x512.png' alt="이미지자리"/>
+        <br/>
         <img src={require('./images/'+this.state.submit+'.jpg')} alt="이미지자리"/>
       </div>
     );
