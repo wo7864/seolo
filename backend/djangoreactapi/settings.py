@@ -40,6 +40,7 @@ INSTALLED_APPS = [
 
     'oneLine',
     'post',
+    'sendParameter',
     'rest_framework',
     'corsheaders',
 ]
