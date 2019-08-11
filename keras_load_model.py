@@ -37,9 +37,8 @@ def plot(samples):
 
     return fig
 
-def img_attach(samples):
+def img_attach(samples, attach=20):
     img_size = 28
-    attach = 20  # 이미지를 붙이는 정도. 작을수록 글자 간의 간격이 좁아진다.
     width = attach*(len(samples)-1)+img_size
     result = np.zeros((img_size, width))
     result.fill(0)
@@ -120,22 +119,31 @@ rdr = csv.reader(f)
 for line in rdr:
     image_parameter.append(line)
 f.close()
+
+
 while(1):
     input_text = input("출력할 텍스트를 입력해주세요: ")
     param_1 = int(input("첫번째 파라미터를 입력해주세요(굵기): "))
     param_2 = int(input("두번째 파라미터를 입력해주세요(기울기): "))
+    param_3 = int(input("띄어쓰기 간격을 입력해주세요(1~5): "))
     generated_images = []
     for i in input_text:
-        idx = alphabet.index(i)
-        param = image_parameter[idx][1:]
-        param = list(map(int, param))
-        param_list = []
-        for j in param:
-            param_list.append(z_list[idx][j])
-        fin_z = (param_list[0]*(100-param_1) + param_list[1]*param_1 + param_list[2]*(100-param_2) + param_list[3]*param_2)/200
-        fin_z = np.array(list(fin_z)*100).reshape(100,100)
-        generated_images.append(model_list[idx].predict(fin_z)[0])
+        if i == " ":
+            tmp = np.zeros((28, 28))
+            tmp.fill(0)
+            generated_images.append(tmp)
+        else:
+            idx = alphabet.index(i)
+            param = image_parameter[idx][1:]
+            param = list(map(int, param))
+            param_list = []
+            for j in param:
+                param_list.append(z_list[idx][j])
+            fin_z = (param_list[0]*(100-param_1) + param_list[1]*param_1 + param_list[2]*(100-param_2) + param_list[3]*param_2)/200
+            fin_z = np.array(list(fin_z)*100).reshape(100,100)
+            generated_images.append(model_list[idx].predict(fin_z)[0])
 
     result = img_attach(generated_images)
     plt.show()
     plt.close(result)
+
