@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 from random import *
 import csv
+from matplotlib.pyplot import cm
+import cv2
 
 def load_z(target):
     with open("./z_value/{}.txt".format(target), "r") as f:
@@ -37,11 +39,12 @@ def plot(samples):
 
     return fig
 
-def img_attach(samples, attach=14):
+def img_attach(samples, text, p1, p2, attach=14):
+    save_dir = "./result/"
     img_size = 28
     width = attach*(len(samples)-1)+img_size
     result = np.zeros((img_size, width))
-    result.fill(0)
+    result.fill(-1)
     for idx, img in enumerate(samples):
         img = img.reshape(img_size, img_size)
         if idx==0:
@@ -49,9 +52,9 @@ def img_attach(samples, attach=14):
         else:
             for idx_i, val_i in enumerate(img):
                 for idx_j, val_j in enumerate(val_i):
-                    if img[idx_i, idx_j] > result[idx_i, attach*idx + idx_j]:
+                    if img[idx_i, idx_j] >= result[idx_i, attach*idx + idx_j]:
                         result[idx_i, attach*idx + idx_j] = img[idx_i, idx_j]
-    print(result[26,29])
+    result = abs(result-1)
 
     fig = plt.figure(figsize=(1, 1))
     gs = gridspec.GridSpec(1, 1)
@@ -61,7 +64,11 @@ def img_attach(samples, attach=14):
     ax.set_xticklabels([])
     ax.set_yticklabels([])
     ax.set_aspect('equal')
-    plt.imshow(result.reshape(img_size, width), cmap='Greys_r')
+    plt.imshow(result, cmap='gray')
+    plt.show()
+    filename = save_dir + "{}_{}_{}_{}.png".format(text, p1, p2, attach)
+    fig.savefig(filename)
+
     return fig
 
 def div2_draw(z,x1,x2,y1,y2):# 4개의 모양, 2개의 축을 이용하여 변화되는 모습을 그림
@@ -121,7 +128,7 @@ def excute(text, p1, p2, p3):
     for i in text:
         if i == " ":
             tmp = np.zeros((28, 28))
-            tmp.fill(0)
+            tmp.fill(-1)
             generated_images.append(tmp)
         else:
             idx = alphabet.index(i)
@@ -130,12 +137,14 @@ def excute(text, p1, p2, p3):
             param_list = []
             for j in param:
                 param_list.append(z_list[idx][j])
-                fin_z = (param_list[0] * (100 - p1) + param_list[1] * p1 + param_list[2] * (100 - p2) + param_list[3] * p2) / 200
-                fin_z = np.array(list(fin_z) * 100).reshape(100, 100)
-                generated_images.append(model_list[idx].predict(fin_z)[0])
+            fin_z = (param_list[0] * (100 - p1) + param_list[1] * p1 + param_list[2] * (100 - p2) + param_list[3] * p2) / 200
+            fin_z = np.array(list(fin_z) * 100).reshape(100, 100)
+            generated_images.append(model_list[idx].predict(fin_z)[0])
 
-    result = img_attach(generated_images, p3)
-    plt.imsave(result, "{}_{}_{}_{}.png".format(text, p1, p2, p3))
+    result = img_attach(generated_images, text, p1, p2, p3)
+    #plt.imsave(filename, result, cmap=cm.gray)
     plt.close(result)
 
 
+if __name__ == "__main__":
+    excute("I LOVE YOU",100, 0, 20)
