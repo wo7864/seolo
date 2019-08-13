@@ -147,4 +147,4 @@ def excute(text, p1, p2, p3):
 
 
 if __name__ == "__main__":
-    excute("I LOVE YOU",100, 0, 20)
+    excute("I AM LEGATO",0, 100, 20)
