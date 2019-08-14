@@ -29,16 +29,16 @@ class App extends Component {
       <input type="range" value={this.state.sParam2}  onChange={this._handleSliderChange2}/>
       <br/>
       <input type="range" value={this.state.sParam3}  onChange={this._handleSliderChange3}/>
-        <h1>OneLine App</h1>
+        <h1>CALLIGRAPICK</h1>
         <div>
           <label>
-            Text:
             <input
               type="text"
               value={this.state.value}
               onChange={this._handleTextChange}
             />
           </label>
+          <br/>
           <button onClick={this._handleTextSubmit}>submit</button>
         </div>
         <h2>Long Text</h2>
