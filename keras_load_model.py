@@ -7,6 +7,7 @@ import csv
 from matplotlib.pyplot import cm
 import cv2
 
+
 def load_z(target):
     with open("./z_value/{}.txt".format(target), "r") as f:
         z_value = f.read().replace("\n", "").replace("[", " ").replace("]", " ").replace("  ", " ").replace("  ", " ").replace("  ", " ")
@@ -15,6 +16,7 @@ def load_z(target):
         z_value = np.array(z_value).reshape(100, 100)
     return z_value
 
+
 def load_model(target):
     json_file = open("./model/{}/{}.json".format(target,target), "r")
     loaded_model_json = json_file.read()
@@ -22,6 +24,7 @@ def load_model(target):
     loaded_model = model_from_json(loaded_model_json)
     loaded_model.load_weights("./model/{}/{}.h5".format(target, target))
     return loaded_model
+
 
 def plot(samples):
     fig = plt.figure(figsize=(10, 10))
@@ -39,7 +42,8 @@ def plot(samples):
 
     return fig
 
-def img_attach(samples, text, p1, p2, attach=14):
+
+def img_attach(samples, text, p1, p2, p3, p4, attach=14):
     save_dir = "./result/"
     img_size = 28
     width = attach*(len(samples)-1)+img_size
@@ -47,7 +51,7 @@ def img_attach(samples, text, p1, p2, attach=14):
     result.fill(-1)
     for idx, img in enumerate(samples):
         img = img.reshape(img_size, img_size)
-        if idx==0:
+        if idx == 0:
             result[:,:img_size] = img
         else:
             for idx_i, val_i in enumerate(img):
@@ -56,6 +60,12 @@ def img_attach(samples, text, p1, p2, attach=14):
                         result[idx_i, attach*idx + idx_j] = img[idx_i, idx_j]
     result = abs(result-1)
 
+    for idx, i in enumerate(result):
+        for idx2, j in enumerate(i):
+            if j < 1.3:
+                result[idx][idx2] = 0
+            elif j > 1.7:
+                result[idx][idx2] = 2
     fig = plt.figure(figsize=(1, 1))
     gs = gridspec.GridSpec(1, 1)
     gs.update(wspace=0.05, hspace=0.05)
@@ -71,7 +81,9 @@ def img_attach(samples, text, p1, p2, attach=14):
 
     return fig
 
-def div2_draw(z,x1,x2,y1,y2):# 4개의 모양, 2개의 축을 이용하여 변화되는 모습을 그림
+
+# 4개의 모양, 2개의 축을 이용하여 변화되는 모습을 그림
+def div2_draw(z,x1,x2,y1,y2):
     x1 = z[x1]
     x2 = z[x2]
     y1 = z[y1]
@@ -93,6 +105,7 @@ def div1_draw(z, x, y):
         z[i] = (x*one + y*ten)/(one+ten)
     return z
 
+
 # 랜덤 출력 // 입력받은 문자열을 랜덤한 z_value로 출력한다.
 def random_generate():
     input_text = input()
@@ -104,11 +117,13 @@ def random_generate():
         generated_images.append(model_list[idx].predict(z_list[idx])[rand_num])
     return generated_images
 
+
 def set_parameter_generate(z, ):
 
     return 0
 
-def excute(text, p1, p2, p3):
+
+def excute(text, p1, p2, p3, p4, p5):
     alphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
                 'V', 'W', 'X', 'Y', 'Z']
     model_list = []
@@ -137,14 +152,18 @@ def excute(text, p1, p2, p3):
             param_list = []
             for j in param:
                 param_list.append(z_list[idx][j])
-            fin_z = (param_list[0] * (100 - p1) + param_list[1] * p1 + param_list[2] * (100 - p2) + param_list[3] * p2) / 200
+            fin_z = (param_list[0] * p1 + param_list[1] * p2 + param_list[2] * p3 + param_list[3] * p4) / \
+                    (p1 + p2 + p3 + p4)
             fin_z = np.array(list(fin_z) * 100).reshape(100, 100)
             generated_images.append(model_list[idx].predict(fin_z)[0])
 
-    result = img_attach(generated_images, text, p1, p2, p3)
+    result = img_attach(generated_images, text, p1, p2, p3, p4, p5)
     #plt.imsave(filename, result, cmap=cm.gray)
+    result2 = plot(generated_images)
+    plt.show()
+    plt.close(result2)
     plt.close(result)
 
 
 if __name__ == "__main__":
-    excute("I AM LEGATO",0, 100, 20)
+    excute("HELLO", 100, 0, 0, 0, 20)

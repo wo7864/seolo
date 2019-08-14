@@ -44,6 +44,7 @@ ex) G_450.png 일 경우, model, z_value 디렉토리에서 G_450.h5, G_450.json
 
 ## Data set
 Kaggle - A-Z Handwritten Alphabets in .csv format
+
 ![DataSet](/others/dataset.png)
 
 https://www.kaggle.com/sachinpatel21/az-handwritten-alphabets-in-csv-format
