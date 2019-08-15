@@ -11,8 +11,11 @@ class App extends Component {
     sParam1 : "50",
     sParam2 : "40",
     sParam3 : "30",
+    sParam4 : "20",
+    sParam5 : "10",
     value: "",
     submit: "default",//제출된 텍스트를 담을 곳 , default 이미지가 존재해야함
+    names : [],
     textList: []
   };
 
@@ -21,7 +24,8 @@ class App extends Component {
   }
   render() {
     const { textList } = this.state;
-    console.log(textList);
+    //step 3.src 부분에 {name} 나중에 넣어주면 됨 왜냐하면 name 값에 url이 들어갈 거기 때문 현재는 고정 src로 테스트
+    const nameList = this.state.names.map( (name,index) => (<li key={index}>{name}<br/><img src="https://item.kakaocdn.net/do/8bdb8dec2d96f5e334479d9e139a892cf43ad912ad8dd55b04db6a64cddaf76d" alt={name}/></li>));
     return (
       <div className="App">
       <input type="range" value={this.state.sParam1}  onChange={this._handleSliderChange1}/>
@@ -29,6 +33,11 @@ class App extends Component {
       <input type="range" value={this.state.sParam2}  onChange={this._handleSliderChange2}/>
       <br/>
       <input type="range" value={this.state.sParam3}  onChange={this._handleSliderChange3}/>
+      <br/>
+      <input type="range" value={this.state.sParam4}  onChange={this._handleSliderChange4}/>
+      <br/>
+      <input type="range" value={this.state.sParam5}  onChange={this._handleSliderChange5}/>
+      <h4>예쁜 손글씨를 빠르게 만들어보세요!</h4>
         <h1>CALLIGRAPICK</h1>
         <div>
           <label>
@@ -52,9 +61,8 @@ class App extends Component {
             />
           );
         })}
-        <img src='https://www.valentinog.com/blog/wp-content/uploads/2018/03/django-rest-react@2x-1024x512.png' alt="이미지자리"/>
         <br/>
-        {/*<img src={require('./images/'+this.state.submit+'.jpg')} alt="이미지자리"/>*/}
+       {nameList}
       </div>
     );
   }
@@ -67,22 +75,37 @@ class App extends Component {
   _handleSliderChange3 = event => {
     this.setState({ sParam3 : event.target.value });
   };
+  _handleSliderChange4 = event => {
+    this.setState({ sParam4 : event.target.value });
+  };
+  _handleSliderChange5 = event => {
+    this.setState({ sParam5 : event.target.value });
+  };
   _handleTextChange = event => {
     this.setState({ value : event.target.value });
+    this.setState({  name : event.target.value /*step 1.여기에 생성된 이미지의 url을 주면 됨*/ });
   };
   _handleTextSubmit = () => {
     const { value } = this.state;
     const { sParam1 } = this.state;
     const { sParam2 } = this.state;
     const { sParam3 } = this.state;
+    const { sParam4 } = this.state;
+    const { sParam5 } = this.state;
     //텍스트 박스에 있는 내용을 value에 담고 그걸 this.state.submit에 넣어줌
     this.setState({ submit : value });
     this.setState({ sParam1 : sParam1 });
     this.setState({ sParam2 : sParam2 });
     this.setState({ sParam3 : sParam3 });
+    this.setState({ sParam4 : sParam4 });
+    this.setState({ sParam5 : sParam5 });
+    this.setState({
+      names : this.state.names.concat(this.state.name),/*step 2.submit된 name 값을 맵에 넣어주고 name값 초기화*/
+      name:'',
+    });
     axios
-    //calligraphy
-      .post("http://localhost:8000/api/wisesaying/", { text: value+"_"+sParam1+"_"+sParam2+"_"+sParam3 })
+    //calligraphy로 api명 변경 필요
+      .post("http://localhost:8000/api/wisesaying/", { text: value+"_"+sParam1+"_"+sParam2+"_"+sParam3+"_"+sParam4+"_"+sParam5 })
       .then(res => this._renderText());
   };
   _renderText = () => {
