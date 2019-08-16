@@ -23,6 +23,14 @@ class App extends Component {
     this._renderText();
   }
   render() {
+    const styleTitle = {
+      fontSize : '80px',
+      fontWeight : 'bold',
+    }
+    const styleSubTitle = {
+      fontSize : '20px',
+      fontWeight : 'bold',
+    }
     const { textList } = this.state;
     //step 3.src 부분에 {name} 나중에 넣어주면 됨 왜냐하면 name 값에 url이 들어갈 거기 때문 현재는 고정 src로 테스트
     // 원본 const nameList = this.state.names.map( (name,index) => (<li key={index}>{name}<br/><img src="https://item.kakaocdn.net/do/8bdb8dec2d96f5e334479d9e139a892cf43ad912ad8dd55b04db6a64cddaf76d" alt={name}/></li>));
@@ -39,8 +47,8 @@ class App extends Component {
       <input type="range" value={this.state.sParam4}  onChange={this._handleSliderChange4}/>
       <br/>
       <input type="range" value={this.state.sParam5}  onChange={this._handleSliderChange5}/>
-      <h4>예쁜 손글씨를 빠르게 만들어보세요!</h4>
-        <h1>CALLIGRAPICK</h1>
+      <div style={styleSubTitle}>예쁜 손글씨를 빠르게 만들어보세요!</div>
+        <div style={styleTitle}>CALLIGRAPICK</div>
         <div>
           <label>
             <input
@@ -52,7 +60,6 @@ class App extends Component {
           <br/>
           <button onClick={this._handleTextSubmit}>submit</button>
         </div>
-        <h2>Long Text</h2>
         {textList.map((text, index) => {
           return (
             <TextItem
