@@ -25,7 +25,9 @@ class App extends Component {
   render() {
     const { textList } = this.state;
     //step 3.src 부분에 {name} 나중에 넣어주면 됨 왜냐하면 name 값에 url이 들어갈 거기 때문 현재는 고정 src로 테스트
-    const nameList = this.state.names.map( (name,index) => (<li key={index}>{name}<br/><img src="https://item.kakaocdn.net/do/8bdb8dec2d96f5e334479d9e139a892cf43ad912ad8dd55b04db6a64cddaf76d" alt={name}/></li>));
+    // 원본 const nameList = this.state.names.map( (name,index) => (<li key={index}>{name}<br/><img src="https://item.kakaocdn.net/do/8bdb8dec2d96f5e334479d9e139a892cf43ad912ad8dd55b04db6a64cddaf76d" alt={name}/></li>));
+    //아래 소스는 src={name} 추가하고 alt 수정하면 댐
+    const nameList = this.state.names.map( (name,index) => (<li key={index}>{name}<br/><img alt={name}/></li>));
     return (
       <div className="App">
       <input type="range" value={this.state.sParam1}  onChange={this._handleSliderChange1}/>
@@ -100,7 +102,7 @@ class App extends Component {
     this.setState({ sParam4 : sParam4 });
     this.setState({ sParam5 : sParam5 });
     this.setState({
-      names : this.state.names.concat(this.state.name),/*step 2.submit된 name 값을 맵에 넣어주고 name값 초기화*/
+      names : this.state.names.concat("url/"+value+"_"+sParam1+"_"+sParam2+"_"+sParam3+"_"+sParam4+"_"+sParam5+".png"),/*step 2.submit된 name 값을 맵에 넣어주고 name값 초기화*/
       name:'',
     });
     axios
