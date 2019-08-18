@@ -123,7 +123,12 @@ class App extends Component {
     });
     axios
     //calligraphy로 api명 변경 필요
-      .post("http://localhost:8000/api/wisesaying/", { text: value+"_"+sParam1+"_"+sParam2+"_"+sParam3+"_"+sParam4+"_"+sParam5 })
+      .post("http://localhost:8000/api/wisesaying/", { name : value,
+                                                       param1 : sParam1,
+                                                       param2 : sParam2,
+                                                       param3 : sParam3,
+                                                       param4 : sParam4,
+                                                       param5 : sParam5,})
       .then(res => this._renderText());
   };
   _renderText = () => {
