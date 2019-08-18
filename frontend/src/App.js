@@ -112,6 +112,7 @@ class App extends Component {
     this.setState({ sParam5 : sParam5 });
     this.setState({
       //names : this.state.names.concat("url/"+value+"_"+sParam1+"_"+sParam2+"_"+sParam3+"_"+sParam4+"_"+sParam5+".png"),/*step 2.submit된 name 값을 맵에 넣어주고 name값 초기화*/
+      // eslint-disable-next-line
       names : this.state.names.concat("https://calligrapick.s3.ap-northeast-2.amazonaws.com/result/"+"wj_0_0_0_0_0"+".png"),/*step 2.submit된 name 값을 맵에 넣어주고 name값 초기화*/
       name:'',
     });
