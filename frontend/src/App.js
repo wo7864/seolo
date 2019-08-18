@@ -31,6 +31,11 @@ class App extends Component {
       fontSize : '20px',
       fontWeight : 'bold',
     }
+    const styleSubmit ={
+      border : '0',
+      borderRadius : '5px',
+      backgroundColor : '#777777',
+    }
     const { textList } = this.state;
     //step 3.src 부분에 {name} 나중에 넣어주면 됨 왜냐하면 name 값에 url이 들어갈 거기 때문 현재는 고정 src로 테스트
     const nameList = this.state.names.map( (name,index) => (<img key={index} src={name} alt="이미지 찾지 못함"/>));
@@ -40,7 +45,7 @@ class App extends Component {
       <br/>
       <br/>
       <div style={styleSubTitle}>예쁜 손글씨를 빠르게 만들어보세요!</div>
-        <div style={styleTitle}>CALLIGRAPICK</div>
+        <div style={styleTitle}>한글날</div>
         <div>
           <label>
             <input
@@ -49,17 +54,17 @@ class App extends Component {
               onChange={this._handleTextChange}
             />
           </label>
-          &nbsp;&nbsp;&nbsp;&nbsp;<button onClick={this._handleTextSubmit}>submit</button>
+          &nbsp;&nbsp;&nbsp;&nbsp;<button style={styleSubmit} onClick={this._handleTextSubmit}>제출</button>
           <br/><br/>
-          파라미터 1 <input type="range" value={this.state.sParam1}  onChange={this._handleSliderChange1}/>
+          Bold - low <input type="range" value={this.state.sParam1}  onChange={this._handleSliderChange1}/>
           <br/>
-          파라미터 2 <input type="range" value={this.state.sParam2}  onChange={this._handleSliderChange2}/>
+          Bold - high <input type="range" value={this.state.sParam2}  onChange={this._handleSliderChange2}/>
           <br/>
-          파라미터 3 <input type="range" value={this.state.sParam3}  onChange={this._handleSliderChange3}/>
+          Italic - low <input type="range" value={this.state.sParam3}  onChange={this._handleSliderChange3}/>
           <br/>
-          파라미터 4 <input type="range" value={this.state.sParam4}  onChange={this._handleSliderChange4}/>
+          Italic - high <input type="range" value={this.state.sParam4}  onChange={this._handleSliderChange4}/>
           <br/>
-          파라미터 5 <input type="range" value={this.state.sParam5}  onChange={this._handleSliderChange5}/>
+          Kerning &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="range" value={this.state.sParam5}  onChange={this._handleSliderChange5}/>
           <br/>
         </div>
         {textList.map((text, index) => {
