@@ -13,7 +13,7 @@ class App extends Component {
     sParam3 : "30",
     sParam4 : "20",
     sParam5 : "10",
-    value: "",
+    value: "", // 사용자가 입력한 텍스트
     submit: "default",//제출된 텍스트를 담을 곳 , default 이미지가 존재해야함
     names : [],
     textList: []
@@ -33,20 +33,12 @@ class App extends Component {
     }
     const { textList } = this.state;
     //step 3.src 부분에 {name} 나중에 넣어주면 됨 왜냐하면 name 값에 url이 들어갈 거기 때문 현재는 고정 src로 테스트
-    // 원본 const nameList = this.state.names.map( (name,index) => (<li key={index}>{name}<br/><img src="https://item.kakaocdn.net/do/8bdb8dec2d96f5e334479d9e139a892cf43ad912ad8dd55b04db6a64cddaf76d" alt={name}/></li>));
-    //아래 소스는 src={name} 추가하고 alt 수정하면 댐
-    const nameList = this.state.names.map( (name,index) => (<li key={index}>{name}<br/><img alt={name}/></li>));
+    const nameList = this.state.names.map( (name,index) => (<img key={index} src={name} alt="이미지 찾지 못함"/>));
     return (
       <div className="App">
-      <input type="range" value={this.state.sParam1}  onChange={this._handleSliderChange1}/>
       <br/>
-      <input type="range" value={this.state.sParam2}  onChange={this._handleSliderChange2}/>
       <br/>
-      <input type="range" value={this.state.sParam3}  onChange={this._handleSliderChange3}/>
       <br/>
-      <input type="range" value={this.state.sParam4}  onChange={this._handleSliderChange4}/>
-      <br/>
-      <input type="range" value={this.state.sParam5}  onChange={this._handleSliderChange5}/>
       <div style={styleSubTitle}>예쁜 손글씨를 빠르게 만들어보세요!</div>
         <div style={styleTitle}>CALLIGRAPICK</div>
         <div>
@@ -57,8 +49,18 @@ class App extends Component {
               onChange={this._handleTextChange}
             />
           </label>
+          &nbsp;&nbsp;&nbsp;&nbsp;<button onClick={this._handleTextSubmit}>submit</button>
+          <br/><br/>
+          파라미터 1 <input type="range" value={this.state.sParam1}  onChange={this._handleSliderChange1}/>
           <br/>
-          <button onClick={this._handleTextSubmit}>submit</button>
+          파라미터 2 <input type="range" value={this.state.sParam2}  onChange={this._handleSliderChange2}/>
+          <br/>
+          파라미터 3 <input type="range" value={this.state.sParam3}  onChange={this._handleSliderChange3}/>
+          <br/>
+          파라미터 4 <input type="range" value={this.state.sParam4}  onChange={this._handleSliderChange4}/>
+          <br/>
+          파라미터 5 <input type="range" value={this.state.sParam5}  onChange={this._handleSliderChange5}/>
+          <br/>
         </div>
         {textList.map((text, index) => {
           return (
@@ -109,7 +111,8 @@ class App extends Component {
     this.setState({ sParam4 : sParam4 });
     this.setState({ sParam5 : sParam5 });
     this.setState({
-      names : this.state.names.concat("url/"+value+"_"+sParam1+"_"+sParam2+"_"+sParam3+"_"+sParam4+"_"+sParam5+".png"),/*step 2.submit된 name 값을 맵에 넣어주고 name값 초기화*/
+      //names : this.state.names.concat("url/"+value+"_"+sParam1+"_"+sParam2+"_"+sParam3+"_"+sParam4+"_"+sParam5+".png"),/*step 2.submit된 name 값을 맵에 넣어주고 name값 초기화*/
+      names : this.state.names.concat("https://calligrapick.s3.ap-northeast-2.amazonaws.com/result/"+"wj_0_0_0_0_0"+".png"),/*step 2.submit된 name 값을 맵에 넣어주고 name값 초기화*/
       name:'',
     });
     axios
