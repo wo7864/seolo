@@ -42,18 +42,11 @@ ex) G_450.png 일 경우, model, z_value 디렉토리에서 G_450.h5, G_450.json
 1. open keras_load_model.py
 
 
-## Data set
-Kaggle - A-Z Handwritten Alphabets in .csv format
+## Data set - Kaggle - A-Z Handwritten Alphabets in .csv format
 
 ![DataSet](/others/dataset.png)
 
 https://www.kaggle.com/sachinpatel21/az-handwritten-alphabets-in-csv-format
-
-### create Model
-> automation_keras_gan_alphabet.ipynb
-
-### Load model & generate image
-> keras_load_model.py
 
 ## Development Environment
 - Google Colab

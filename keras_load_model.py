@@ -4,8 +4,7 @@ import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 from random import *
 import csv
-from matplotlib.pyplot import cm
-import cv2
+
 
 
 def load_z(target):
@@ -41,6 +40,17 @@ def plot(samples):
     plt.tight_layout()
 
     return fig
+
+
+def ready():
+    alphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
+                'V', 'W', 'X', 'Y', 'Z']
+    model_list = []
+    z_list = []
+    for i in alphabet:
+        model_list.append(load_model(i))
+        z_list.append(load_z(i))
+    return alphabet, model_list, z_list
 
 
 def img_attach(samples, text, p1, p2, p3, p4, attach=14):
@@ -107,7 +117,7 @@ def div1_draw(z, x, y):
 
 
 # 랜덤 출력 // 입력받은 문자열을 랜덤한 z_value로 출력한다.
-def random_generate():
+def random_generate(alphabet, model_list, z_list):
     input_text = input()
     generated_images = []
 
@@ -123,14 +133,8 @@ def set_parameter_generate(z, ):
     return 0
 
 
-def excute(text, p1, p2, p3, p4, p5):
-    alphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
-                'V', 'W', 'X', 'Y', 'Z']
-    model_list = []
-    z_list = []
-    for i in alphabet:
-        model_list.append(load_model(i))
-        z_list.append(load_z(i))
+def excute(model_list, z_list, alphabet, text, p1, p2, p3, p4, p5):
+
     image_parameter = []
 
     f = open('alphabet_parameter.csv', 'r', encoding='utf-8')
@@ -159,11 +163,9 @@ def excute(text, p1, p2, p3, p4, p5):
 
     result = img_attach(generated_images, text, p1, p2, p3, p4, p5)
     #plt.imsave(filename, result, cmap=cm.gray)
-    result2 = plot(generated_images)
     plt.show()
-    plt.close(result2)
     plt.close(result)
 
 
 if __name__ == "__main__":
-    excute("HELLO", 0, 100, 0, 0, 20)
+    excute("HI MAESTRO", 0, 100, 0, 0, 20)
