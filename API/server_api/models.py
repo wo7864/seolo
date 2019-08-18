@@ -14,6 +14,8 @@ class Calli(models.Model):
     param1 = models.CharField(max_length=144, blank=True)
     param2 = models.CharField(max_length=144, blank=True)
     param3 = models.CharField(max_length=144, blank=True)
+    param4 = models.CharField(max_length=144, blank=True)
+    param5 = models.CharField(max_length=144, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     def __str__(self):
         return '{}'.format(self.name)

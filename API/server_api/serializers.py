@@ -30,6 +30,8 @@ class CalliSerializer(serializers.ModelSerializer):
             'param1',
             'param2',
             'param3',
+            'param4',
+            'param5',
             'created_at',
         )
         read_only_fields = ('created_at',)

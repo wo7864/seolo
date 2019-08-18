@@ -75,7 +75,6 @@ def img_attach(samples, text, p1, p2, p3, p4, attach=14):
     ax.set_yticklabels([])
     ax.set_aspect('equal')
     plt.imshow(result, cmap='gray')
-    plt.show()
     filename = save_dir + "{}_{}_{}_{}.png".format(text, p1, p2, attach)
     fig.savefig(filename)
 
@@ -138,6 +137,8 @@ def excute(text, p1, p2, p3, p4, p5):
     for line in rdr:
         image_parameter.append(line)
     f.close()
+    print('================================================')
+    print('generate image...')
 
     generated_images = []
     for i in text:
@@ -159,9 +160,7 @@ def excute(text, p1, p2, p3, p4, p5):
 
     result = img_attach(generated_images, text, p1, p2, p3, p4, p5)
     #plt.imsave(filename, result, cmap=cm.gray)
-    result2 = plot(generated_images)
-    plt.show()
-    plt.close(result2)
+    print('finish!')
     plt.close(result)
 
 
