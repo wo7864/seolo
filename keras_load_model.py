@@ -134,7 +134,7 @@ def set_parameter_generate(z, ):
 
 
 def excute(model_list, z_list, alphabet, text, p1, p2, p3, p4, p5):
-
+    print(p1, p2, p3, p4, p5)
     image_parameter = []
 
     f = open('alphabet_parameter.csv', 'r', encoding='utf-8')
