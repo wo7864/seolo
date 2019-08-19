@@ -24,6 +24,7 @@ class App extends Component {
   }
   render() {
     const bg=require('./images/back2.png')
+    const img_href=require('')
     const bgStyle ={
       backgroundImage: "url("+bg+")",
       position: 'absolute',
@@ -59,11 +60,16 @@ class App extends Component {
       borderRadius:'10px',
       height:'20px',
     }
+    const imgStyle={
+      width:'100px',
+      height:'100px',
+      margin:'5px',
+    }
     const { textList } = this.state;
     //step 3.src 부분에 {name} 나중에 넣어주면 됨 왜냐하면 name 값에 url이 들어갈 거기 때문 현재는 고정 src로 테스트
-    const nameList = this.state.names.map( (name,index) => (<img key={index} src={name} alt="이미지 찾지 못함"/>));
+    const nameList = this.state.names.map( (name,index) => (<a href={name}><img key={index} style={imgStyle} src={name} alt="이미지 찾지 못함"/></a>));
     return (
-      <div className="App"  style ={ bgStyle}>
+      <div className="App" style ={ bgStyle}>
       <br/>
       <br/>
       <br/>
