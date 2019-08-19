@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 from random import *
 import csv
-
+import os
 
 def load_z(target):
     with open("./z_value/{}.txt".format(target), "r") as f:
@@ -87,8 +87,10 @@ def img_attach(samples, text, p1, p2, p3, p4, attach=14):
     ax.set_yticklabels([])
     ax.set_aspect('equal')
     plt.imshow(result, cmap='gray')
-    filename = save_dir + "{}_{}_{}_{}.png".format(text, p1, p2, attach)
-    fig.savefig(filename)
+    filename = "{}_{}_{}_{}_{}_{}.png".format(text, p1, p2, p3, p4, attach)
+    fig.savefig(save_dir + filename)
+    com = 's3cmd put ./result/{} s3://calligrapick/result/'.format(filename)
+    os.system(com)
 
     return fig
 

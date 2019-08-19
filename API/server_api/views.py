@@ -36,14 +36,14 @@ class CalliView(viewsets.ModelViewSet):
         serializer_class = CalliSerializer
 
         def perform_create(self, serializer):
-            name = self.request.POST['name']
-            param1 = self.request.POST['param1']
-            param2 = self.request.POST['param2']
-            param3 = self.request.POST['param3']
-            param4 = self.request.POST['param4']
-            param5 = self.request.POST['param5']
+            name = self.request.data['name']
+            param1 = self.request.data['param1']
+            param2 = self.request.data['param2']
+            param3 = self.request.data['param3']
+            param4 = self.request.data['param4']
+            param5 = self.request.data['param5']
 
-            excute(model_list, z_list, alphabet, name, float(param1), float(param2), float(param3), float(param4),
+            excute(model_list, z_list, alphabet, name, int(param1), int(param2), int(param3), int(param4),
                    int(param5))
             serializer.save()
 
