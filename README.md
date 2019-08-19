@@ -15,7 +15,12 @@ GAN을 활용한 손글씨 생성 프로젝트입니다.
 - reference
 
 ## Install
-> git clone https://github.com/wo7864/Calligrapick
+> git clone https://git.swmgit.org/root/p1017_dblock.git
+cd p1017_dblock
+
+
+
+
 
 ### Model Create
 모델 생성은 ipynb 파일로 작성되어 Google Colab, 또는 Jupyter notebook 환경에서 진행합니다.
