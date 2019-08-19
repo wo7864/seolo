@@ -18,11 +18,20 @@ class App extends Component {
     names : [],
     textList: []
   };
-
+  
   componentDidMount() {
     this._renderText();
   }
   render() {
+    const bg=require('./images/back2.png')
+    const bgStyle ={
+      backgroundImage: "url("+bg+")",
+      position: 'absolute',
+      top:'0', 
+      left: '0',
+      width: '100%',
+      height: '100%',
+    }
     const styleTitle = {
       fontSize : '80px',
       fontWeight : 'bold',
@@ -33,28 +42,43 @@ class App extends Component {
     }
     const styleSubmit ={
       border : '0',
-      borderRadius : '5px',
-      backgroundColor : '#777777',
+      borderRadius : '10px',
+      backgroundColor : '#555555',
+      width:'200px',
+      color:'white',
+      height:'25px',
+    }
+    const logoSize ={
+      width: '350px',
+      height: '225px',
+      marginTop:'-60px',
+      marginBottom:'-40px',
+    }
+    const inputStyle ={
+      width: '200px',
+      borderRadius:'10px',
+      height:'20px',
     }
     const { textList } = this.state;
     //step 3.src 부분에 {name} 나중에 넣어주면 됨 왜냐하면 name 값에 url이 들어갈 거기 때문 현재는 고정 src로 테스트
     const nameList = this.state.names.map( (name,index) => (<img key={index} src={name} alt="이미지 찾지 못함"/>));
     return (
-      <div className="App">
+      <div className="App"  style ={ bgStyle}>
       <br/>
       <br/>
       <br/>
-      <div style={styleSubTitle}>예쁜 손글씨를 빠르게 만들어보세요!</div>
-        <div style={styleTitle}>한글날</div>
+      <p style={styleSubTitle}>예쁜 손글씨를 빠르게 만들어보세요!</p>
+        <img src={require('./images/logo.png')} style={logoSize}/>
         <div>
-          <label>
+          <p>
             <input
               type="text"
               value={this.state.value}
               onChange={this._handleTextChange}
+              style={inputStyle}
             />
-          </label>
-          &nbsp;&nbsp;&nbsp;&nbsp;<button style={styleSubmit} onClick={this._handleTextSubmit}>제출</button>
+          </p>
+          <button style={styleSubmit} onClick={this._handleTextSubmit}>제출</button>
           <br/><br/>
           Bold - low <input type="range" value={this.state.sParam1}  onChange={this._handleSliderChange1}/>
           <br/>
@@ -115,21 +139,20 @@ class App extends Component {
     this.setState({ sParam3 : sParam3 });
     this.setState({ sParam4 : sParam4 });
     this.setState({ sParam5 : sParam5 });
-    this.setState({
-      //names : this.state.names.concat("url/"+value+"_"+sParam1+"_"+sParam2+"_"+sParam3+"_"+sParam4+"_"+sParam5+".png"),/*step 2.submit된 name 값을 맵에 넣어주고 name값 초기화*/
-      // eslint-disable-next-line
-      names : this.state.names.concat("https://calligrapick.s3.ap-northeast-2.amazonaws.com/result/"+"wj_0_0_0_0_0"+".png"),/*step 2.submit된 name 값을 맵에 넣어주고 name값 초기화*/
-      name:'',
-    });
+
     axios
     //calligraphy로 api명 변경 필요
-      .post("http://localhost:8000/api/wisesaying/", { name : value,
-                                                       param1 : sParam1,
-                                                       param2 : sParam2,
-                                                       param3 : sParam3,
-                                                       param4 : sParam4,
-                                                       param5 : sParam5,})
-      .then(res => this._renderText());
+      .post("http://15.164.49.159:8000/api/callis", {name : value, param1 : sParam1, param2 : sParam2, param3 : sParam3, param4 : sParam4, param5 : sParam5,})
+      .then(res =>{ 
+        this._renderText();
+        this.setState({
+          //names : this.state.names.concat("url/"+value+"_"+sParam1+"_"+sParam2+"_"+sParam3+"_"+sParam4+"_"+sParam5+".png"),/*step 2.submit된 name 값을 맵에 넣어주고 name값 초기화*/
+          // eslint-disable-next-line
+          names : this.state.names.concat("https://calligrapick.s3.ap-northeast-2.amazonaws.com/result/"+value+"_"+sParam1+"_"+sParam2+"_"+sParam3+"_"+sParam4+"_"+sParam5+".png"),/*step 2.submit된 name 값을 맵에 넣어주고 name값 초기화*/
+          name:'',
+        });
+        
+      });
   };
   _renderText = () => {
     axios
