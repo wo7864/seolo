@@ -8,11 +8,11 @@ axios.defaults.xsrfHeaderName = "X-CSRFToken";
 
 class App extends Component {
   state = {
-    sParam1 : "50",
-    sParam2 : "40",
-    sParam3 : "30",
-    sParam4 : "20",
-    sParam5 : "10",
+    sParam1 : "100",
+    sParam2 : "0",
+    sParam3 : "0",
+    sParam4 : "0",
+    sParam5 : "20",
     value: "", // 사용자가 입력한 텍스트
     submit: "default",//제출된 텍스트를 담을 곳 , default 이미지가 존재해야함
     names : [],
