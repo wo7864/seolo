@@ -1,0 +1,9 @@
+vae_model/
+
+generated_img/
+
+result/
+
+API/result/
+
+frontend/node_modules
