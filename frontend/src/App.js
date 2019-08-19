@@ -24,7 +24,6 @@ class App extends Component {
   }
   render() {
     const bg=require('./images/back2.png')
-    const img_href=require('')
     const bgStyle ={
       backgroundImage: "url("+bg+")",
       position: 'absolute',
