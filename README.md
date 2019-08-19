@@ -18,13 +18,14 @@ GAN을 활용한 손글씨 생성 프로젝트입니다.
 
 ## Install
 - Server
+
 	0. install python3
 	1. git clone https://git.swmgit.org/root/p1017_dblock.git
 	2. 가상환경 실행(venv)
 	3. python 라이브러리 설치(pip install django djangorestframework opencv-python tensorflow matplotlib keras)
-	4. cd API
-	5. python manage.py runserver
+	4. python manage.py runserver
 - Client
+
 	0. install nodejs(npm)
 	1. npm install --save react react-dom react-script
 	2. frontend/src/app.js내부 axios.post(url) 본인 서버로 수정
