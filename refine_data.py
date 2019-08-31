@@ -3,8 +3,8 @@ import numpy as np
 from matplotlib import pyplot as plt
 from PIL import Image
 import sys
-
-sys.setrecursionlimit(100000000)
+import os
+sys.setrecursionlimit(1000000)
 
 
 def rgba2rgb(filename):
@@ -17,11 +17,12 @@ def rgba2rgb(filename):
     background.save('font/JPG/'+filename+'.jpg', 'JPEG', quality=80)
 
 # 현재 떨림체는 변환 문제로 제외한 상태
-'''
+
 font_list = ['bangwool', 'bangwool_b', 'baram', 'baram_b', 'bawi', 'bawi_b', 'bburi', 'bidan', 'bidan_b', 'bori',
              'bori_b', 'buddle', 'buddle_b', 'dasle', 'goorm', 'groom_b', 'jandi', 'janggun', 'namu',
-             'namu_b', 'namu_c', 'sandle', 'seassack', 'seassack_b', 'sonmut', 'sonmut_b', 'taepoong', 'yetdol']'''
-font_list = ['buddle']
+             'namu_b', 'namu_c', 'sandle', 'seassack', 'seassack_b', 'sonmut', 'sonmut_b', 'taepoong', 'yetdol']
+for i in font_list:
+    os.system('rm font/{}/*'.format(i))
 '''
 for i in font_list:
     rgba2rgb(i)
@@ -46,7 +47,7 @@ def search(row, col, img, visit, row_value, col_value):
 
 
 def search2(row_value, col_value, img, visit):
-    num = 9
+    num = 10
     for i in range(len(row_value)):
         if img[row_value[i]+num][col_value[i]] <= 200:
             search(row_value[i]+num, col_value[i], img, visit, row_value, col_value)
@@ -69,25 +70,37 @@ for filename in font_list:
 
     visit = np.zeros([3333, 5000])
     data = []
-    for row, i in enumerate(img):
-        for col, j in enumerate(i[:2400]):
-            if j <= 100 and visit[row][col] == 0:
-                row_value = []
-                col_value = []
-                search(row, col, img, visit, row_value, col_value)
-                search2(row_value, col_value, img, visit)
-                edge = [max(row_value), min(row_value), max(col_value), min(col_value)]
-                data.append(edge)
-
-    for row, i in enumerate(img):
-        for col, j in enumerate(i[2400:]):
-            if j <= 100 and visit[row][col+2400] == 0:
-                row_value = []
-                col_value = []
-                search(row, col+2400, img, visit, row_value, col_value)
-                search2(row_value, col_value, img, visit)
-                edge = [max(row_value), min(row_value), max(col_value), min(col_value)]
-                data.append(edge)
+    height_line = [120, 360, 580, 800, 1020, 1240, 1460, 1660, 1880, 2100, 2320, 2540, 2760, 2980, 3200]
+    for k in range(1, len(height_line)):
+        col = 0
+        while col < 2500:
+            row = height_line[k-1]
+            while row < height_line[k]:
+                if img[row][col] <= 100 and visit[row][col] == 0:
+                    row_value = []
+                    col_value = []
+                    search(row, col, img, visit, row_value, col_value)
+                    search2(row_value, col_value, img, visit)
+                    edge = [max(row_value)+5, min(row_value)-5, max(col_value)+5, min(col_value)-5]
+                    data.append(edge)
+                    visit[edge[1]:edge[0], edge[3]:edge[2]] = 1
+                row += 1
+            col += 1
+    for k in range(1, len(height_line)):
+        col = 2500
+        while col < 5000:
+            row = height_line[k-1]
+            while row < height_line[k]:
+                if img[row][col] <= 100 and visit[row][col] == 0:
+                    row_value = []
+                    col_value = []
+                    search(row, col, img, visit, row_value, col_value)
+                    search2(row_value, col_value, img, visit)
+                    edge = [max(row_value)+5, min(row_value)-5, max(col_value)+5, min(col_value)-5]
+                    data.append(edge)
+                    visit[edge[1]:edge[0], edge[3]:edge[2]] = 1
+                row += 1
+            col += 1
 
     for idx, i in enumerate(data):
         try:
@@ -106,8 +119,9 @@ for filename in font_list:
                 tmp = np.hstack([tmp, tmp3])
             else:
                 share = 128 / width
+                height = int(share * height)
                 if width > 128:
-                    tmp = cv2.resize(tmp, (128, int(share * height)), interpolation=cv2.INTER_LINEAR)
+                    tmp = cv2.resize(tmp, (128, height), interpolation=cv2.INTER_LINEAR)
                 else:
                     tmp = cv2.resize(tmp, (128, height), interpolation=cv2.INTER_AREA)
                 tmp2 = np.full([int((128-height) / 2), 128], 255)
