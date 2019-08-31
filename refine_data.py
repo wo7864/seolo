@@ -17,12 +17,12 @@ def rgba2rgb(filename):
     background.save('font/JPG/'+filename+'.jpg', 'JPEG', quality=80)
 
 # 현재 떨림체는 변환 문제로 제외한 상태
-
+'''
 font_list = ['bangwool', 'bangwool_b', 'baram', 'baram_b', 'bawi', 'bawi_b', 'bburi', 'bidan', 'bidan_b', 'bori',
              'bori_b', 'buddle', 'buddle_b', 'dasle', 'goorm', 'groom_b', 'jandi', 'janggun', 'namu',
              'namu_b', 'namu_c', 'sandle', 'seassack', 'seassack_b', 'sonmut', 'sonmut_b', 'taepoong', 'yetdol']
-for i in font_list:
-    os.system('rm font/{}/*'.format(i))
+'''
+font_list = ['yuwool']
 '''
 for i in font_list:
     rgba2rgb(i)
