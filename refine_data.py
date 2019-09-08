@@ -17,11 +17,10 @@ def rgba2rgb(filename):
     background.save('font/JPG/'+filename+'.jpg', 'JPEG', quality=80)
 
 # 현재 떨림체는 변환 문제로 제외한 상태
-'''
+
 font_list = ['bangwool', 'bangwool_b', 'baram', 'baram_b', 'bawi', 'bawi_b', 'bburi', 'bidan', 'bidan_b', 'bori',
              'bori_b', 'buddle', 'buddle_b', 'dasle', 'goorm', 'groom_b', 'jandi', 'janggun', 'namu',
              'namu_b', 'namu_c', 'sandle', 'seassack', 'seassack_b', 'sonmut', 'sonmut_b', 'taepoong', 'yetdol']
-'''
 font_list = ['yuwool']
 '''
 for i in font_list:
@@ -101,33 +100,33 @@ for filename in font_list:
                     visit[edge[1]:edge[0], edge[3]:edge[2]] = 1
                 row += 1
             col += 1
-
+    img_size = 28
     for idx, i in enumerate(data):
         try:
             tmp = img[i[1]:i[0], i[3]:i[2]]
             height, width = tmp.shape[:2]
             if height > width:
-                share = 128 / height
+                share = img_size / height
                 width = int(share * width)
-                if height > 128:
-                    tmp = cv2.resize(tmp, (width, 128), interpolation=cv2.INTER_LINEAR)
+                if height > img_size:
+                    tmp = cv2.resize(tmp, (width, img_size), interpolation=cv2.INTER_LINEAR)
                 else:
-                    tmp = cv2.resize(tmp, (width, 128), interpolation=cv2.INTER_AREA)
-                tmp2 = np.full([128, int((128-width) / 2)], 255)
-                tmp3 = np.full([128, 128-(width + tmp2.shape[1])], 255)
+                    tmp = cv2.resize(tmp, (width, img_size), interpolation=cv2.INTER_AREA)
+                tmp2 = np.full([img_size, int((img_size-width) / 2)], 255)
+                tmp3 = np.full([img_size, img_size-(width + tmp2.shape[1])], 255)
                 tmp = np.hstack([tmp2, tmp])
                 tmp = np.hstack([tmp, tmp3])
             else:
-                share = 128 / width
+                share = img_size / width
                 height = int(share * height)
-                if width > 128:
-                    tmp = cv2.resize(tmp, (128, height), interpolation=cv2.INTER_LINEAR)
+                if width > img_size:
+                    tmp = cv2.resize(tmp, (img_size, height), interpolation=cv2.INTER_LINEAR)
                 else:
-                    tmp = cv2.resize(tmp, (128, height), interpolation=cv2.INTER_AREA)
-                tmp2 = np.full([int((128-height) / 2), 128], 255)
-                tmp3 = np.full([128-(height + tmp2.shape[0]), 128], 255)
+                    tmp = cv2.resize(tmp, (img_size, height), interpolation=cv2.INTER_AREA)
+                tmp2 = np.full([int((img_size-height) / 2), img_size], 255)
+                tmp3 = np.full([img_size-(height + tmp2.shape[0]), img_size], 255)
                 tmp = np.vstack([tmp2, tmp])
                 tmp = np.vstack([tmp, tmp3])
-            plt.imsave('font/{}/{}.png'.format(filename, str(idx)), tmp, cmap='Greys_r')
+            plt.imsave('data/{}/{}.png'.format(filename, str(idx)), tmp, cmap='Greys_r')
         except Exception as e:
             print(str(e))

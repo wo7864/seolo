@@ -168,4 +168,4 @@ def excute(model_list, z_list, alphabet, text, p1, p2, p3, p4, p5):
 
 
 if __name__ == "__main__":
-    excute("HI MAESTRO", 0, 100, 0, 0, 20)
+    excute("ㄱㅏ", 0, 100, 0, 0, 20)
