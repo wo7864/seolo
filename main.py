@@ -137,14 +137,17 @@ def img_attach(imgs, text, latter_attach=60, phoneme_attach=30):
             elif text[idx][3] != 26:
                 print("Case 2-2")
                 for idx2, img in enumerate(latter):
-                    img = img.reshape(img_size1, img_size1)
-                    tmp = np.full([img_size1, int(img_size2 / 2)], 1)
-                    img = np.hstack([tmp, img])
-                    img = np.hstack([img, tmp])
-                    for idx_i, val_i in enumerate(img):
-                        for idx_j, val_j in enumerate(val_i):
-                            if img[idx_i, idx_j] <= result[idx_i + idx2 * img_size1-5, latter_attach * idx + idx_j]:
-                                result[idx_i + idx2 * img_size1-5, latter_attach * idx + idx_j] = img[idx_i, idx_j]
+                    if text[idx][idx2] != 26:
+                        img = img.reshape(img_size1, img_size1)
+                        tmp = np.full([img_size1, int(img_size2 / 2)], 1)
+                        img = np.hstack([tmp, img])
+                        img = np.hstack([img, tmp])
+                        if idx2 == 3:
+                            idx2 = 2
+                        for idx_i, val_i in enumerate(img):
+                            for idx_j, val_j in enumerate(val_i):
+                                if img[idx_i, idx_j] <= result[idx_i + idx2 * img_size1-5, latter_attach * idx + idx_j]:
+                                    result[idx_i + idx2 * img_size1-5, latter_attach * idx + idx_j] = img[idx_i, idx_j]
         # Case 3: 모음 (ㅘ, ㅙ, ㅚ, ㅝ, ...)
         else:
             # Case 3-1: 종성 x
@@ -239,7 +242,6 @@ def random_generate(font, model_list, z_list, text_list):
             else:
                 latter.append("")
         generated_images.append(latter)
-    print(len(generated_images))
     return generated_images
 
 
@@ -286,5 +288,5 @@ def main(font, text):
 
 
 if __name__ == "__main__":
-    input_text = "너정말"
+    input_text = "나는바보인가"
     main(0, input_text)
