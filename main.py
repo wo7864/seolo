@@ -6,6 +6,7 @@ from random import *
 import csv
 import cv2
 import time
+from PIL import Image
 
 # 만든 모델 리스트
 phoneme_list = ['ㄱ', 'ㄴ', 'ㄷ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅅ', 'ㅇ', 'ㅈ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ', 'ㅏ', 'ㅑ', 'ㅔ', 'ㅐ'
@@ -17,9 +18,8 @@ def load_z(font):
     z_value_list = []
     for phoneme in range(1, 27):
         with open("./z_value/{}/{}/{}.txt".format(font, phoneme, '450'), "r") as f:
-            z_value = f.read().replace("\n", "").replace("[", " ").replace("]", " ").replace("  ", " ").replace("  ",
-                                                                                                                " ").replace(
-                "  ", " ")
+            z_value = f.read().replace("\n", "").replace("[", " ").replace("]", " ")\
+                .replace("  ", " ").replace("  "," ").replace("  ", " ")
             z_value = z_value[1:-1].split(" ")
             z_value = [float(f) for f in z_value]
             z_value = np.array(z_value).reshape(100, 100)
@@ -60,7 +60,7 @@ def ready():
     font_list = ['bangwool', 'bangwool_b', 'baram', 'baram_b', 'bawi', 'bawi_b', 'bburi', 'bidan', 'bidan_b', 'bori',
                  'bori_b', 'buddle', 'buddle_b', 'dasle', 'goorm', 'groom_b', 'jandi', 'janggun', 'namu',
                  'namu_b', 'namu_c', 'sandle', 'seassack', 'seassack_b', 'sonmut', 'sonmut_b', 'taepoong', 'yetdol']
-    font_list = ['bangwool']
+    font_list = ['bangwool', 'baram_b']
 
     model_list = []
     z_list = []
@@ -70,7 +70,7 @@ def ready():
     return font_list, model_list, z_list
 
 
-def img_attach(imgs, text, latter_attach=60, phoneme_attach=30):
+def img_attach(imgs, text, latter_attach=60, definition=30, color=0, phoneme_width_attach=30, phoneme_height_attach=30):
     save_dir = "./result/"
     latter_size = 84
     print(text)
@@ -88,8 +88,10 @@ def img_attach(imgs, text, latter_attach=60, phoneme_attach=30):
             img = np.full([img_size3, img_size3], 1)
             for idx_i, val_i in enumerate(img):
                 for idx_j, val_j in enumerate(val_i):
-                    if img[idx_i, idx_j] <= result[idx_i + height_point, latter_attach * width_point + idx_j]:
-                        result[idx_i + height_point, latter_attach * width_point + idx_j] = img[idx_i, idx_j]
+                    y = idx_i + height_point
+                    x = latter_attach * width_point + idx_j
+                    if img[idx_i, idx_j] <= result[y, x]:
+                        result[y, x] = img[idx_i, idx_j]
         elif text[idx][0] == 27:
             height_point += 84
             width_point = -1
@@ -109,8 +111,10 @@ def img_attach(imgs, text, latter_attach=60, phoneme_attach=30):
                         img = np.vstack([img, tmp])
                         for idx_i, val_i in enumerate(img):
                             for idx_j, val_j in enumerate(val_i):
-                                if img[idx_i, idx_j] <= result[idx_i + height_point, latter_attach * width_point + phoneme_attach * idx2 + idx_j]:
-                                    result[idx_i + height_point, latter_attach * width_point + phoneme_attach * idx2 + idx_j] = img[idx_i, idx_j]
+                                y = idx_i + height_point
+                                x = latter_attach * width_point + phoneme_width_attach * idx2 + idx_j
+                                if img[idx_i, idx_j] <= result[y, x]:
+                                    result[y, x] = img[idx_i, idx_j]
             # Case 1-2: 종성 o
             elif text[idx][3] != 26:
                 print("Case 1-2")
@@ -121,17 +125,18 @@ def img_attach(imgs, text, latter_attach=60, phoneme_attach=30):
                             img = cv2.resize(img, (img_size2, img_size2), interpolation=cv2.INTER_AREA)
                             for idx_i, val_i in enumerate(img):
                                 for idx_j, val_j in enumerate(val_i):
-                                    if img[idx_i, idx_j] <= result[idx_i+5 + height_point, latter_attach * width_point + phoneme_attach * idx2 + idx_j]:
-                                        result[idx_i+5 + height_point, latter_attach * width_point + phoneme_attach * idx2 + idx_j] = img[idx_i, idx_j]
+                                    y = idx_i + height_point
+                                    x = latter_attach * width_point + phoneme_width_attach * idx2 + idx_j
+                                    if img[idx_i, idx_j] <= result[y, x]:
+                                        result[y, x] = img[idx_i, idx_j]
                         else:
                             img = cv2.resize(img, (img_size2, img_size2), interpolation=cv2.INTER_AREA)
-                            tmp = np.full([img_size2, int(img_size2 / 2)], 1)
-                            img = np.hstack([tmp, img])
-                            img = np.hstack([img, tmp])
                             for idx_i, val_i in enumerate(img):
                                 for idx_j, val_j in enumerate(val_i):
-                                    if img[idx_i, idx_j] <= result[idx_i + img_size2 + height_point, latter_attach * width_point + idx_j]:
-                                        result[idx_i+img_size2 + height_point, latter_attach * width_point + idx_j] = img[idx_i, idx_j]
+                                    y = idx_i + phoneme_height_attach + height_point
+                                    x = latter_attach * width_point + phoneme_width_attach + idx_j
+                                    if img[idx_i, idx_j] <= result[y, x]:
+                                        result[y, x] = img[idx_i, idx_j]
         # Case 2: 모음 ( ㅗ, ㅛ, ㅜ, ㅠ, ㅡ)
         elif 21 <= text[idx][1] <= 25 and text[idx][2] == 26:
             # Case 2-1: 종성 x
@@ -146,23 +151,28 @@ def img_attach(imgs, text, latter_attach=60, phoneme_attach=30):
                         img = np.hstack([img, tmp])
                         for idx_i, val_i in enumerate(img):
                             for idx_j, val_j in enumerate(val_i):
-                                if img[idx_i, idx_j] <= result[idx_i + idx2 * img_size2-5 + height_point, latter_attach * width_point + idx_j]:
-                                    result[idx_i + idx2 * img_size2-5 + height_point, latter_attach * width_point + idx_j] = img[idx_i, idx_j]
+                                y = int(idx_i + idx2 * (img_size2/2) + height_point)
+                                x = latter_attach * width_point + idx_j
+                                if img[idx_i, idx_j] <= result[y, x]:
+                                    result[y, x] = img[idx_i, idx_j]
             # Case 2-2: 종성 o
             elif text[idx][3] != 26:
                 print("Case 2-2")
                 for idx2, img in enumerate(latter):
                     if text[idx][idx2] != 26:
                         img = img.reshape(img_size1, img_size1)
-                        tmp = np.full([img_size1, int(img_size2 / 2)], 1)
+                        img = cv2.resize(img, (img_size2, img_size2), interpolation=cv2.INTER_AREA)
+                        tmp = np.full([img_size2, int(img_size2 / 2)], 1)
                         img = np.hstack([tmp, img])
                         img = np.hstack([img, tmp])
                         if idx2 == 3:
                             idx2 = 2
                         for idx_i, val_i in enumerate(img):
                             for idx_j, val_j in enumerate(val_i):
-                                if img[idx_i, idx_j] <= result[idx_i + idx2 * img_size1-5 + height_point, latter_attach * width_point + idx_j]:
-                                    result[idx_i + idx2 * img_size1-5 + height_point, latter_attach * width_point + idx_j] = img[idx_i, idx_j]
+                                y = int(idx_i + idx2 * (img_size2/2) + height_point)
+                                x = latter_attach * width_point + idx_j
+                                if img[idx_i, idx_j] <= result[y, x]:
+                                    result[y, x] = img[idx_i, idx_j]
         # Case 3: 모음 (ㅘ, ㅙ, ㅚ, ㅝ, ...)
         else:
             # Case 3-1: 종성 x
@@ -192,15 +202,38 @@ def img_attach(imgs, text, latter_attach=60, phoneme_attach=30):
                 print("Case 3-2")
         width_point += 1
 
-    # result = abs(result-1)
-    '''
+    definition = (100 - definition) / 100
+    # definition: 0~1
     for idx, i in enumerate(result):
         for idx2, j in enumerate(i):
-            if j < 0:
+            if j < definition*-1:
                 result[idx][idx2] = -1
-            elif j >= 0:
+            elif j >= definition:
                 result[idx][idx2] = 1
-   '''
+
+    # 색상 변경
+    if color==1:
+        result = result[:]*-1
+
+    # 투명도
+    tmp = np.full([result.shape[0], result.shape[1]], 1.0)
+    for idx, i in enumerate(result):
+        for idx2, j in enumerate(i):
+            if color == 0:
+                if j > 0:
+                    tmp[idx][idx2] = 0.0
+            else:
+                if j <= 0:
+                    tmp[idx][idx2] = 0.0
+
+    print(tmp.shape)
+    print(result.shape)
+    print(tmp[0], tmp[50])
+    result = cv2.merge((result, result, result, tmp))
+    #result = Image.fromarray(result)
+    #result = result.convert("RGB")
+    #result = np.array(result)
+    print(result)
     fig = plt.figure(figsize=(1, 1))
     gs = gridspec.GridSpec(1, 1)
     gs.update(wspace=0.05, hspace=0.05)
@@ -251,10 +284,8 @@ def random_generate(font, model_list, z_list, text_list):
         for i in text:
             if i < 26:
                 rand_num = randint(0, 99)
-                z = z_list[font][int(i)] + 1
-                print(z[0])
-                img = model_list[font][int(i)].predict(z)[0]
-                #img = model_list[font][int(i)].predict(rand_z)[rand_num]
+                #img = model_list[font][int(i)].predict(z)[0]
+                img = model_list[font][int(i)].predict(rand_z)[rand_num]
                 latter.append(img)
             else:
                 latter.append("")
@@ -292,27 +323,27 @@ def convert_text(korean_word):
     for idx, i in enumerate(r_lst):
         for idx2, j in enumerate(i):
             r_lst[idx][idx2] = phoneme_list.index(j)
-    print(r_lst)
     return r_lst
 
 
 def main(font, text):
     font_list, model_list, z_list = ready()
     text = convert_text(text)
-
-    start = time.time()
-    generated_images = random_generate(font, model_list, z_list, text)
-    result = img_attach(generated_images, text)
-    print("time :", time.time() - start)
-    plt.show()
-    plt.close(result)
+    latter_list = [100]
+    for i in latter_list:
+        start = time.time()
+        generated_images = random_generate(font, model_list, z_list, text)
+        result = img_attach(generated_images, text, i, 50, 0)
+        print("time :", time.time() - start)
+        plt.show()
+        plt.close(result)
 
 if __name__ == "__main__":
-    input_text = "아름다운\n   한글"
+    input_text = "은하수"
     main(0, input_text)
 
 # main(0, input_text, 10, 12, 13, 14, 15, 16)
-# 선명도, 색, 굵기, 서체 종류, 자모음간 거리, 글자간 거리
-# 띄어쓰기, 엔터, 투명화
+# 색, 굵기, 서체 종류, 자모음간 거리
+# 투명화: 수정 필요함. 정도에 따라 알파값 따로주기
 # 하임, 돌하르방, 아름다운 한글, 은하수
 # ㅎ, ㅇ, ㅏ, ㅣ, ㅁ, ㄷ, ㅗ, ㄹ, ㅂ, ㅡ, ㅜ, ㄴ, ㄱ, ㅅ
