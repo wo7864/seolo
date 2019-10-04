@@ -25,3 +25,5 @@ data/
 params/
 
 infogan_model/
+
+tensorboard/
