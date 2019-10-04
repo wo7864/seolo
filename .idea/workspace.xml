@@ -29,12 +29,13 @@
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\wo786\Calligrapick\img" />
-      <recent name="C:\Users\wo786\Calligrapick" />
-    </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\wo786\KoreanDay" />
+      <recent name="C:\Users\wo786\Calligrapick" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\wo786\KoreanDay\API\server_api" />
+      <recent name="C:\Users\wo786\Calligrapick\img" />
       <recent name="C:\Users\wo786\Calligrapick" />
     </key>
   </component>
