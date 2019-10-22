@@ -1,29 +1,29 @@
-vae_model/
 
-generated_img/
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-result/
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+frontend/node_modules/
+# testing
+/coverage
 
-API/result/
+# production
+/build
 
-frontend/node_modules
+# misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
-font/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-model/
 
-others/
-
-venv/
-
-z_value/
-
-img/
-
-data/
-
-params/
-
-infogan_model/
-
-tensorboard/
+# api
+api/infogan_model/
+api/static/image/
