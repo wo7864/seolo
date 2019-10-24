@@ -4,7 +4,7 @@ from flask_cors import CORS
 import numpy as np
 import load_model
 import cv2
-
+import os
 from urllib import parse
 import main
 import json
@@ -24,19 +24,7 @@ phoneme_list = ['ㄱ', 'ㄴ', 'ㄷ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅅ', 'ㅇ', 'ㅈ', '
     , 'ㅓ', 'ㅕ', 'ㅣ', 'ㅗ', 'ㅛ', 'ㅜ', 'ㅠ', 'ㅡ', ' ', '\n']
 
 
-'''
-@app.route("/create", methods=['POST'])
-def create():
-    global text, shape_list, ori_text, latter_list
-    ori_text = request.form['text']
-    text, shape_list = main.convert_text(ori_text)
-    param_list = [-1]*5
-    latter_list = main.create_latter_list(model_list[0], sess_list[0], text, shape_list, param_list)
-    filename = main.img_attach(latter_list, 50, 70, 0, ori_text)
-    img_list.append(filename)
-    return redirect(url_for('index'))
 
-'''
 class Calligraphy(Resource):
     def get(self):
         return 'hi'
@@ -48,6 +36,8 @@ class Calligraphy(Resource):
         text, shape_list = main.convert_text(input_text)
         latter_list, json_latter_list = main.create_latter_list(model_list, sess_list, text, shape_list, param_list)
         filename = main.img_attach(latter_list, 70, 0, input_text)
+        com = 's3cmd put ./static/image/{}.png s3://seolo/static/image/'.format(filename)
+        os.system(com)
         res = {
             "filename": filename,
             "latter_list": json_latter_list
@@ -68,6 +58,8 @@ class Calligraphy(Resource):
             target_img = cv2.resize(target_img, (int(latter_list[latter_num][phoneme_num].width), int(latter_list[latter_num][phoneme_num].height)), interpolation=cv2.INTER_LINEAR)
         latter_list[latter_num][phoneme_num].img = target_img
         filename = main.img_attach(latter_list, 70, 0, input_text)
+        com = 's3cmd put ./static/image/{}.png s3://seolo/static/image/'.format(filename)
+        os.system(com)
         text[latter_num][phoneme_num]['img'] = target_img.tolist()
         res = {
             "filename": filename,
