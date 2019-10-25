@@ -30,7 +30,7 @@ class Calligraphy(Resource):
         return 'hi'
     def post(self):
         args = parser.parse_args()
-        font = args['font']
+        font = int(args['font'])
         input_text = args['input_text']
         param_list = [-1] * 4
         text, shape_list = main.convert_text(input_text)
@@ -45,6 +45,7 @@ class Calligraphy(Resource):
         return res
     def put(self):
         args = parser.parse_args()
+        font = int(args['font'])
         latter_num = int(args['latter_num'])
         phoneme_num = int(args['phoneme_num'])
         text = args['latter_list']
@@ -53,7 +54,7 @@ class Calligraphy(Resource):
         text = json.loads(text)
         latter_list = main.json_to_obj(text)
         model_num = phoneme_list.index(latter_list[latter_num][phoneme_num].phoneme)
-        target_img = main.create_one_image(latter_list[latter_num][phoneme_num], model_list[model_num], sess_list[model_num])
+        target_img = main.create_one_image(latter_list[latter_num][phoneme_num], model_list[font][model_num], sess_list[font][model_num])
         if target_img.shape[1] != latter_list[latter_num][phoneme_num].width or target_img.shape[0] != latter_list[latter_num][phoneme_num].height:
             target_img = cv2.resize(target_img, (int(latter_list[latter_num][phoneme_num].width), int(latter_list[latter_num][phoneme_num].height)), interpolation=cv2.INTER_LINEAR)
         latter_list[latter_num][phoneme_num].img = target_img
