@@ -11,7 +11,7 @@ export default class Main extends React.Component {
     constructor(props){
         super(props);
         this.state={
-            font:'type1',
+            font:0,
             input_text:'',
             latter_list:[],
             select_phoneme:-1,
@@ -154,9 +154,9 @@ export default class Main extends React.Component {
                 <h1>서로 - 서예 로봇</h1>
                 <span>폰트종류: </span>
                 <select onChange={this.fontChange}>
-                    <option value="type1">동그란 글씨</option>
-                    <option value="type2">날린 글씨</option>
-                    <option value="type3">구수한 글씨</option>
+                    <option value="0">날린 글씨</option>
+                    <option value="1">구수한 글씨</option>
+                    <option value="2">동그란 글씨</option>
                 </select>
                 <br/>
                 <input
