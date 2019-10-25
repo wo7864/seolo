@@ -544,7 +544,7 @@ def img_attach(latter_list, definition, color, ori_text):
     ax.set_aspect('equal')
     plt.imshow(result, cmap='Greys_r')
     now = datetime.now()
-    filename = ori_text + now.strftime("_%m_%d_%Y_%H_%M_%S")
+    filename = ori_text + now.strftime("_%m_%d_%Y_%H_%M_%S.png")
     save_dir = 'static/image/'
     fig.set_size_inches(result.shape[1]/100, result.shape[0]/100)
     fig.savefig(save_dir + filename)
