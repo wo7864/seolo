@@ -34,8 +34,8 @@ class Calligraphy(Resource):
         input_text = args['input_text']
         param_list = [-1] * 4
         text, shape_list = main.convert_text(input_text)
-        latter_list, json_latter_list = main.create_latter_list(model_list, sess_list, text, shape_list, param_list)
-        filename = main.img_attach(latter_list, 70, 0, input_text)
+        latter_list, json_latter_list = main.create_latter_list(font, model_list, sess_list, text, shape_list, param_list)
+        filename = main.img_attach(latter_list, 40, 0, input_text)
         com = 's3cmd put ./static/image/{}.png s3://seolo/static/image/'.format(filename)
         os.system(com)
         res = {
@@ -57,7 +57,7 @@ class Calligraphy(Resource):
         if target_img.shape[1] != latter_list[latter_num][phoneme_num].width or target_img.shape[0] != latter_list[latter_num][phoneme_num].height:
             target_img = cv2.resize(target_img, (int(latter_list[latter_num][phoneme_num].width), int(latter_list[latter_num][phoneme_num].height)), interpolation=cv2.INTER_LINEAR)
         latter_list[latter_num][phoneme_num].img = target_img
-        filename = main.img_attach(latter_list, 70, 0, input_text)
+        filename = main.img_attach(latter_list, 40, 0, input_text)
         com = 's3cmd put ./static/image/{}.png s3://seolo/static/image/'.format(filename)
         os.system(com)
         text[latter_num][phoneme_num]['img'] = target_img.tolist()

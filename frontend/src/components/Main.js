@@ -11,7 +11,7 @@ export default class Main extends React.Component {
     constructor(props){
         super(props);
         this.state={
-            font:'type1',
+            font:0,
             input_text:'',
             latter_list:[],
             select_phoneme:-1,
