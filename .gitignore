@@ -27,3 +27,4 @@ yarn-error.log*
 # api
 api/infogan_model/
 api/static/image/
+api/env/

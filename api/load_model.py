@@ -6,9 +6,8 @@ def load():
     model_list = []
     for phoneme in range(1, 27):
         print('===================================')
-
         tf.reset_default_graph()
-        sess = tf.Session()
+        sess = tf.compat.v1.Session()
         model = infogan.GAN(sess)
         save_dir = "./infogan_model/type2/"
         filename = "bidan_{}_{}.ckpt".format(phoneme, '380')

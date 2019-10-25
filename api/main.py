@@ -28,7 +28,7 @@ def load_model(font):
         model = infogan.GAN(sess)
         model.saver.restore(sess, "./infogan_model/{}/{}_{}_{}.ckpt".format(phoneme, font, phoneme, '300'))
         model_list.append(model)
-        sess_list.append(sess)
+    sess_list.append(sess)
     return model_list, sess_list
 
 
