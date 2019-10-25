@@ -28,7 +28,7 @@ def load_model(font):
         model = infogan.GAN(sess)
         model.saver.restore(sess, "./infogan_model/{}/{}_{}_{}.ckpt".format(phoneme, font, phoneme, '300'))
         model_list.append(model)
-        sess_list.append(sess)
+    sess_list.append(sess)
     return model_list, sess_list
 
 
@@ -433,7 +433,7 @@ def json_to_obj(text):
     return latter_list
 
 
-def create_latter_list(model_list, sess_list, text, shape_list, param_list):
+def create_latter_list(font, model_list, sess_list, text, shape_list, param_list):
     # 각 음소간에 좌표를 지정하여 phoneme 인스턴스 생성
     latter_list = []
     small_list = [3, 4, 5, 15, 16, 17]
@@ -446,7 +446,7 @@ def create_latter_list(model_list, sess_list, text, shape_list, param_list):
         json_pho_list = []
         for idx2, pho in enumerate(latter):
             if text[idx][idx2] != 26:
-                img = gen_image(pho, model_list[pho], sess_list[pho], param_list)
+                img = gen_image(pho, model_list[font][pho], sess_list[font][pho], param_list)
                 phoneme_list2.append(Phoneme(img, shape_list[idx], idx, idx2, x_point, y_point,
                                              param_list, phoneme_list[text[idx][idx2]], img.shape[1], img.shape[0]))
                 param_list = [0] * 4
