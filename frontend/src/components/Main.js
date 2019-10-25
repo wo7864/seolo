@@ -5,21 +5,13 @@ import ShowImage from './ShowImage';
 import Option from './Option';
 import update from 'react-addons-update';
 
-<<<<<<< HEAD
 const domain = "http://52.78.51.15:5000/calligraphy";
-=======
-const domain = "http://127.0.0.1:5000/calligraphy";
->>>>>>> frontend
 
 export default class Main extends React.Component {
     constructor(props){
         super(props);
         this.state={
-<<<<<<< HEAD
-            font:'type1',
-=======
             font:0,
->>>>>>> frontend
             input_text:'',
             latter_list:[],
             select_phoneme:-1,
