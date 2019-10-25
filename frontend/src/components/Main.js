@@ -5,13 +5,21 @@ import ShowImage from './ShowImage';
 import Option from './Option';
 import update from 'react-addons-update';
 
+<<<<<<< HEAD
 const domain = "http://52.78.51.15:5000/calligraphy";
+=======
+const domain = "http://127.0.0.1:5000/calligraphy";
+>>>>>>> frontend
 
 export default class Main extends React.Component {
     constructor(props){
         super(props);
         this.state={
+<<<<<<< HEAD
             font:'type1',
+=======
+            font:0,
+>>>>>>> frontend
             input_text:'',
             latter_list:[],
             select_phoneme:-1,
@@ -154,9 +162,15 @@ export default class Main extends React.Component {
                 <h1>서로 - 서예 로봇</h1>
                 <span>폰트종류: </span>
                 <select onChange={this.fontChange}>
+<<<<<<< HEAD
                     <option value="type1">동그란 글씨</option>
                     <option value="type2">날린 글씨</option>
                     <option value="type3">구수한 글씨</option>
+=======
+                    <option value="0">날린 글씨</option>
+                    <option value="1">구수한 글씨</option>
+                    <option value="2">동그란 글씨</option>
+>>>>>>> frontend
                 </select>
                 <br/>
                 <input
