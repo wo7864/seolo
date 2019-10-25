@@ -1,8 +1,15 @@
-deploy-to-server:
-  stage: deploy
-  only:
-    - master
-  script:
-    - echo 'hello world!'
-  tags:
-    - deploy
+#Production stage
+production:   
+   stage: production   
+   before_script: 
+   #generate ssh key   
+     - mkdir -p ~/.ssh     
+     - echo -e "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa     
+     - chmod 600 ~/.ssh/id_rsa     
+     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'   
+   script:     
+      - bash .gitlab-deploy.sh   
+   environment:     
+      name: production     
+      url: https://git.swmgit.org 
+   when: manual
