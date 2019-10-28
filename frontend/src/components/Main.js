@@ -2,15 +2,18 @@ import React from 'react';
 import PhonemeList from './PhonemeList';
 import axios from 'axios';
 import ShowImage from './ShowImage';
-import Option from './Option';
+import PhonemeOption from './PhonemeOption';
+import ImageOption from './ImageOption';
 import update from 'react-addons-update';
-
+import InputText from './InputText';
+import SetBackGroundImage from './SetBackGroundImage';
 const domain = "http://127.0.0.1:5000/calligraphy";
 
 export default class Main extends React.Component {
     constructor(props){
         super(props);
         this.state={
+            page:1,
             font:0,
             input_text:'',
             latter_list:[],
@@ -18,26 +21,20 @@ export default class Main extends React.Component {
             filename:'',
             selected_latter:-1,
             selected_phoneme:-1,
-            selected_phoneme2:''
+            selected_phoneme2:'',
+            definition:0,
+            image_width:0,
+            image_height:0,
+            color:0,
+            background_color:0
         };
         this.create_image = this.create_image.bind(this);
         this.handleChange = this.handleChange.bind(this);
-        this.fontChange = this.fontChange.bind(this);
         this.select_phoneme = this.select_phoneme.bind(this);
         this.update_image = this.update_image.bind(this);
         this.change_value = this.change_value.bind(this);
     }
 
-    handleChange(e){
-        this.setState({
-            input_text: e.target.value
-        });
-    }
-    fontChange(e){
-        this.setState({
-            font: e.target.value
-        });
-    }
     create_image(){
         axios.post(domain, 
             {
@@ -47,7 +44,8 @@ export default class Main extends React.Component {
             .then( response => { 
                 this.setState({
                     filename:response.data.filename+".png",
-                    latter_list:response.data.latter_list
+                    latter_list:response.data.latter_list,
+                    page:1
                 })
                 console.log(response);
             })
@@ -111,6 +109,32 @@ export default class Main extends React.Component {
         }
     }
 
+    handleChange(e){
+        let nextState = {};
+        nextState[e.target.name] = e.target.value;
+        this.setState(nextState);
+    }
+
+    set_image_option(){
+        let data = this.state.latter_list;
+
+        axios.put(domain+'image', {
+            latter_list:[data],
+            definition:this.state.definition,
+            image_width:this.state.image_width,
+            image_height:this.state.image_height,
+            color:this.state.color,
+            background_color:this.state.background_color
+        })
+            .then( response => {
+                this.setState({
+                    filename:response.data.filename+".png",
+                    latter_list:response.data.latter_list
+                })
+            })
+            .catch( response => {console.log(response);});
+    }
+
     update_image(){
         let data = this.state.latter_list;
         let target = this.state.latter_list[this.state.selected_latter][this.state.selected_phoneme];
@@ -149,24 +173,24 @@ export default class Main extends React.Component {
             latter_idx++;
             korean_latter_list.push(tmp);
         }
-        return(
+        let html = '';
+        if(this.state.page == 0){
+            html = 
+            <InputText
+                input_text={this.state.input_text}
+                create_image={this.create_image}
+                handleChange={this.handleChange}
+                fontChange={this.fontChange}/>
+        }else if(this.state.page == 1){
+            html = 
             <div>
-                <h1>서로 - 서예 로봇</h1>
-                <span>폰트종류: </span>
-                <select onChange={this.fontChange}>
-                    <option value="0">날린 글씨</option>
-                    <option value="1">구수한 글씨</option>
-                    <option value="2">동그란 글씨</option>
-                </select>
-                <br/>
-                <input
-                    placeholder="한글을 입력해주세요."
-                    name="input_text"
-                    value={this.state.input_text}
-                    onChange={this.handleChange}
-                    />
-                <button onClick={this.create_image}>생성</button>
-                <br/>
+                <ImageOption
+                    definition={this.state.definition}
+                    image_width={this.state.image_width}
+                    image_height={this.state.image_height}
+                    handleChange={this.handleChange}
+                    set_image_option={this.set_image_option}
+                />
                 <PhonemeList 
                     update_image={this.update_image}
                     latter_list={this.state.latter_list}
@@ -177,18 +201,27 @@ export default class Main extends React.Component {
                     phoneme2={this.state.selected_phoneme2}
                 />
                 {this.state.selected_phoneme != -1 && 
-                <Option latter={this.state.selected_latter}
-                    phoneme={this.state.selected_phoneme}
-                    phoneme2={this.state.selected_phoneme2}
+                <PhonemeOption 
+                    phoneme={this.state.selected_phoneme2}
                     latter_list={this.state.latter_list}
                     update_image={this.update_image}
                     input_text={this.state.input_text}
-                    change_value={this.change_value}
+                    handleChange={this.handleChange}
                     />
                 }
                 <br/>
-                {this.state.filename !== '' ? <ShowImage filename={this.state.filename}/> : ''}
-                
+                <ShowImage filename={this.state.filename}/>
+            </div>
+        }else if(this.state.page == 2){ // 이미지 배경합성하는 페이지
+            html = 
+            <div>
+                <SetBackGroundImage/>
+            </div>
+        }
+
+        return(
+            <div>
+                {html}
             </div>
         )
     }

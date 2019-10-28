@@ -24,7 +24,7 @@ export default class Option extends React.Component {
         return(
             <div>
                 <div style={div_style}>
-                    <h3>{this.props.phoneme2}</h3>
+                    <h3>{this.props.phoneme}</h3>
                     <span>p1</span>
                     <input type="range" name="p1" value={this.props.latter_list[this.props.latter][this.props.phoneme].params[0]} 
                         onChange={this.props.change_value} onMouseUp={this.props.update_image}/><br/>
