@@ -25,7 +25,6 @@ export default class PhonemeList extends React.Component {
         return(
             <div>
                 {data}
-
             </div>
         )
     }
