@@ -433,7 +433,7 @@ def json_to_obj(text):
     return latter_list
 
 
-def create_latter_list(font, model_list, sess_list, text, shape_list, param_list):
+def create_latter_list(font, model_list, sess_list, text, shape_list, param_list2):
     # 각 음소간에 좌표를 지정하여 phoneme 인스턴스 생성
     latter_list = []
     small_list = [3, 4, 5, 15, 16, 17]
@@ -446,9 +446,9 @@ def create_latter_list(font, model_list, sess_list, text, shape_list, param_list
         json_pho_list = []
         for idx2, pho in enumerate(latter):
             if text[idx][idx2] != 26:
-                img = gen_image(pho, model_list[font][pho], sess_list[font][pho], param_list)
+                img = gen_image(pho, model_list[font][pho], sess_list[font][pho], param_list2)
                 phoneme_list2.append(Phoneme(img, shape_list[idx], idx, idx2, x_point, y_point,
-                                             param_list, phoneme_list[text[idx][idx2]], img.shape[1], img.shape[0]))
+                                             param_list2, phoneme_list[text[idx][idx2]], img.shape[1], img.shape[0]))
                 param_list = [0] * 4
                 json_pho = {
                     "img": img.tolist(),
@@ -475,7 +475,7 @@ def create_latter_list(font, model_list, sess_list, text, shape_list, param_list
     return latter_list, json_latter_list
 
 
-def img_attach(latter_list, definition, color, ori_text):
+def img_attach(latter_list, definition, color, ori_text, result_width=None, result_height=None):
     left = 9999999999
     right = 0
     top = 999999999
@@ -521,8 +521,13 @@ def img_attach(latter_list, definition, color, ori_text):
                 if pho.img != "":
                     result = add_image(result, pho.img, pho.x, pho.y)
 
+
     # 각 길이를 5배로 확장
-    result = cv2.resize(result, (result.shape[1]*5, result.shape[0]*5), interpolation=cv2.INTER_LINEAR)
+    if not result_width:
+        result_width = result.shape[0]*5
+    if not result_height:
+        result_height = result.shape[1]*5
+    result = cv2.resize(result, (result_height, result_width), interpolation=cv2.INTER_LINEAR)
 
     # 선명도 조절
     result = set_definition(result, definition)
@@ -553,9 +558,45 @@ def img_attach(latter_list, definition, color, ori_text):
     return filename
 
 
-def update_image(result, target):
+def blur(img):
+    width = img.shape[1]
+    height = img.shape[0]
+    tmp = np.full((1, 28), 1)
+    tmp2 = np.full((30, 1), 1)
+    img = np.vstack([img, tmp])
+    img = np.vstack([tmp, img])
+    img = np.hstack([img, tmp2])
+    img = np.hstack([tmp2, img])
+    update_list = []
+    for x in range(1, width-1):
+        for y in range(1, height-1):
+            value = img[y-1][x-1] + img[y][x-1] + img[y+1][x-1] \
+            + img[y-1][x] + img[y+1][x] + img[y-1][x+1] + img[y][x+1] + img[y+1][x+1]
+            value /= 8
+            if img[y][x] + 0.5 <value:
+                update_list.append((x, y, value))
+    for i in update_list:
+        img[i[1]][i[0]] = i[2]
+    return img
 
-    return result
+
+def blur2(img):
+    width = img.shape[1]
+    height = img.shape[0]
+    tmp = np.full((1, 28), 1)
+    tmp2 = np.full((30, 1), 1)
+    img = np.vstack([img, tmp])
+    img = np.vstack([tmp, img])
+    img = np.hstack([img, tmp2])
+    img = np.hstack([tmp2, img])
+    for x in range(1, width-1):
+        for y in range(1, height-1):
+            value = img[y-1][x-1] + img[y][x-1] + img[y+1][x-1] \
+            + img[y-1][x] + img[y+1][x] + img[y-1][x+1] + img[y][x+1] + img[y+1][x+1]
+            value /= 8
+            if img[y][x] + 0.5 <value:
+                img[y][x] = value
+    return img
 
 
 def gen_image(text, model, sess, param_list):
@@ -572,10 +613,31 @@ def gen_image(text, model, sess, param_list):
         }
                                  )
         img = np.reshape(generated, (model.height, model.width))  # 이미지 형태로. #num_generate, height, width
+        img = blur(img)
         return img
     else:
         return ''
 
+def remove_noise(img):
+    print(img)
+    width = img.shape[1]
+    height = img.shape[0]
+    val = 4
+    for x in range(width-val):
+        for y in range(height-val):
+            swi = 0
+            for i in range(val):
+                if img[y][x+i] <= 1.0:
+                        swi = 1
+                if img[y+val][x+i] <= 1.0:
+                        swi = 1
+                if img[y+i][x] <= 1.0:
+                        swi = 1
+                if img[y+i][x+val] <= 1.0:
+                        swi = 1
+            if swi == 0:
+                img[y+1:y+val][x+1:x+val] = 1
+    return img
 '''
 def gen_image(font, text_list, model_list, sess_list, param_list):
     start_value = 1

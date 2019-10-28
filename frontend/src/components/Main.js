@@ -5,8 +5,8 @@ import ShowImage from './ShowImage';
 import Option from './Option';
 import update from 'react-addons-update';
 
-const domain = "http://127.0.0.1:5000/calligraphy";
-
+const domain = "http://52.79.89.171:5000/calligraphy";
+//const domain ="http://127.0.0.1:5000/calligraphy";
 export default class Main extends React.Component {
     constructor(props){
         super(props);
