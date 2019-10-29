@@ -25,17 +25,19 @@
     <property name="DefaultHtmlFileTemplate" value="HTML File" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\wo786\api\static\image" />
+      <recent name="C:\Users\wo786\api" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\wo786\seolo\api" />
       <recent name="C:\Users\wo786\api\새 폴더" />
       <recent name="C:\Users\wo786\api\templates" />
       <recent name="C:\Users\wo786\api" />
       <recent name="C:\Users\wo786\api\template" />
-    </key>
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\wo786\api\static\image" />
-      <recent name="C:\Users\wo786\api" />
     </key>
   </component>
   <component name="RunDashboard">

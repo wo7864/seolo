@@ -68,6 +68,18 @@ class Calligraphy(Resource):
         }
         return res
 
+class ImageOption:
+    def put(self):
+        args = parser.parse_args()
+        latter_list = args['latter_list']
+        definition = int(args['definition'])
+        image_width = int(args['image_width'])
+        image_height = int(args['image_height'])
+        color = args['color']
+        background_color = args['background_color']
+        input_text = args['input_text']
+        filename = main.img_attach(latter_list, definition, color, background_color, input_text, image_width, image_height)
+
 
 api.add_resource(Calligraphy, '/calligraphy')
 
