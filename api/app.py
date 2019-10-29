@@ -42,14 +42,18 @@ class Calligraphy(Resource):
         font = int(args['font'])
         input_text = args['input_text']
         param_list = [-1] * 4
+        definition = 50
+        color = [0, 0, 0]
         text, shape_list = main.convert_text(input_text)
         latter_list, json_latter_list = main.create_latter_list(font, model_list, sess_list, text, shape_list, param_list)
-        filename = main.img_attach(latter_list, 40, 0, input_text)
+        filename = main.img_attach(latter_list, definition, color, input_text)
         com = 's3cmd put ./static/image/{} s3://seolo/static/image/'.format(filename)
         os.system(com)
         res = {
+            "latter_list": json_latter_list,
             "filename": filename,
-            "latter_list": json_latter_list
+            "definition": definition,
+            "color": color
         }
         return res
 
@@ -80,7 +84,7 @@ class Calligraphy(Resource):
 
 
 # 이미지 재생성
-class PhonemeShapeOption:
+class PhonemeShapeOption(Resource):
     def put(self):
         args = parser.parse_args()
         text = args['latter_list']
@@ -107,7 +111,7 @@ class PhonemeShapeOption:
 
 
 # 이미지 위치 조정
-class PhonemeLocationOption:
+class PhonemeLocationOption(Resource):
     def put(self):
         args = parser.parse_args()
         text = args['latter_list']
@@ -126,7 +130,7 @@ class PhonemeLocationOption:
 
 
 # 이미지 크기 조정
-class PhonemeSizeOption:
+class PhonemeSizeOption(Resource):
     def put(self):
         args = parser.parse_args()
         text = args['latter_list']
@@ -152,7 +156,7 @@ class PhonemeSizeOption:
 
 
 # 전체 이미지 옵션 수정
-class ImageOption:
+class ImageOption(Resource):
     def put(self):
         args = parser.parse_args()
         latter_list = args['latter_list']
@@ -165,14 +169,16 @@ class ImageOption:
         com = 's3cmd put ./static/image/{} s3://seolo/static/image/'.format(filename)
         os.system(com)
         res = {
+            "latter_list": latter_list,
             "filename": filename,
-            "latter_list": latter_list
+            "definition": definition,
+            "color": color
         }
         return res
 
 
 # 배경 합성하기
-class AddBackGroundImage:
+class AddBackGroundImage(Resource):
     def post(self):
         args = parser.parse_args()
         filename = args['filename']
