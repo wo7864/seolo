@@ -475,7 +475,11 @@ def create_latter_list(font, model_list, sess_list, text, shape_list, param_list
     return latter_list, json_latter_list
 
 
+<<<<<<< HEAD
 def img_attach(latter_list, definition, color, ori_text, result_width=None, result_height=None):
+=======
+def img_attach(latter_list, definition, color, background_color, ori_text, image_width=None, image_height=None):
+>>>>>>> backend
     left = 9999999999
     right = 0
     top = 999999999
@@ -521,6 +525,7 @@ def img_attach(latter_list, definition, color, ori_text, result_width=None, resu
                 if pho.img != "":
                     result = add_image(result, pho.img, pho.x, pho.y)
 
+<<<<<<< HEAD
 
     # 각 길이를 5배로 확장
     if not result_width:
@@ -528,6 +533,14 @@ def img_attach(latter_list, definition, color, ori_text, result_width=None, resu
     if not result_height:
         result_height = result.shape[1]*5
     result = cv2.resize(result, (result_height, result_width), interpolation=cv2.INTER_LINEAR)
+=======
+    if image_width == None:
+        image_width = result.shape[1] * 5
+    if image_height == None:
+        image_height = result.shape[0] * 5
+    # 각 길이를 5배로 확장
+    result = cv2.resize(result, (image_width, image_height), interpolation=cv2.INTER_LINEAR)
+>>>>>>> backend
 
     # 선명도 조절
     result = set_definition(result, definition)

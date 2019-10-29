@@ -24,7 +24,11 @@
   <component name="PropertiesComponent">
     <property name="DefaultHtmlFileTemplate" value="HTML File" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+<<<<<<< HEAD
     <property name="last_opened_file_path" value="$USER_HOME$/Anaconda3/envs/env" />
+=======
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+>>>>>>> backend
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
@@ -33,6 +37,7 @@
       <recent name="C:\Users\wo786\api" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\wo786\seolo\api" />
       <recent name="C:\Users\wo786\api\새 폴더" />
       <recent name="C:\Users\wo786\api\templates" />
       <recent name="C:\Users\wo786\api" />
