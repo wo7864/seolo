@@ -16,10 +16,10 @@ def show_image(img):
     plt.close(fig)
 
 
-def set_color(result, r, g, b):
-    r = np.full([result.shape[0], result.shape[1]], r)
-    g = np.full([result.shape[0], result.shape[1]], g)
-    b = np.full([result.shape[0], result.shape[1]], b)
+def set_color(result, color):
+    r = np.full([result.shape[0], result.shape[1]], color[0])
+    g = np.full([result.shape[0], result.shape[1]], color[1])
+    b = np.full([result.shape[0], result.shape[1]], color[2])
     r = r[:] / 1
     g = g[:] / 1
     b = b[:] / 1
@@ -33,7 +33,7 @@ def set_color(result, r, g, b):
 
 img = cv2.imread("test.png", cv2.IMREAD_GRAYSCALE)
 img = img[:]/255
-img2 = set_color(img, 16, 20, 0)
+img2 = set_color(img, [10, 20, 30])
 img3 = Image.open("bg_test.jpg").convert('RGBA').resize((img2.size[0], img2.size[1]))
 img4 = img3
 img3.paste(img2, (0, 0), img2)

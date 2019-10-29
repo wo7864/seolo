@@ -475,11 +475,22 @@ def create_latter_list(font, model_list, sess_list, text, shape_list, param_list
     return latter_list, json_latter_list
 
 
-<<<<<<< HEAD
-def img_attach(latter_list, definition, color, ori_text, result_width=None, result_height=None):
-=======
-def img_attach(latter_list, definition, color, background_color, ori_text, image_width=None, image_height=None):
->>>>>>> backend
+def set_color(result, color):
+    r = np.full([result.shape[0], result.shape[1]], color[0])
+    g = np.full([result.shape[0], result.shape[1]], color[1])
+    b = np.full([result.shape[0], result.shape[1]], color[2])
+    r = r[:] / 1
+    g = g[:] / 1
+    b = b[:] / 1
+    result = 1 - result[:]
+    result = result[:] * 255
+    result = cv2.merge((r, g, b, result))
+    result = result.astype(np.uint8)
+    result = Image.fromarray(result, 'RGBA')
+    return result
+
+
+def img_attach(latter_list, definition, color, ori_text, image_width=None, image_height=None):
     left = 9999999999
     right = 0
     top = 999999999
@@ -525,49 +536,23 @@ def img_attach(latter_list, definition, color, background_color, ori_text, image
                 if pho.img != "":
                     result = add_image(result, pho.img, pho.x, pho.y)
 
-<<<<<<< HEAD
-
-    # 각 길이를 5배로 확장
-    if not result_width:
-        result_width = result.shape[0]*5
-    if not result_height:
-        result_height = result.shape[1]*5
-    result = cv2.resize(result, (result_height, result_width), interpolation=cv2.INTER_LINEAR)
-=======
-    if image_width == None:
+    if not image_width:
         image_width = result.shape[1] * 5
-    if image_height == None:
+    if not image_height:
         image_height = result.shape[0] * 5
     # 각 길이를 5배로 확장
     result = cv2.resize(result, (image_width, image_height), interpolation=cv2.INTER_LINEAR)
->>>>>>> backend
 
     # 선명도 조절
     result = set_definition(result, definition)
 
-    # 색상 변경
-    if color == 1:
-        result = result[:]*-1
+    # 색 지정
+    result = set_color(result, color)
 
-    # 투명화
-    result = set_invisibility(result, color)
-
-    fig = plt.figure(figsize=(1, 1))
-    gs = gridspec.GridSpec(1, 1)
-    gs.update(wspace=0.05, hspace=0.05)
-    ax = plt.subplot(gs[0])
-    plt.axis('off')
-    ax.set_xticklabels([])
-    ax.set_yticklabels([])
-    ax.set_aspect('equal')
-    plt.imshow(result, cmap='Greys_r')
     now = datetime.now()
     filename = ori_text + now.strftime("_%m_%d_%Y_%H_%M_%S.png")
     save_dir = 'static/image/'
-    fig.set_size_inches(result.shape[1]/100, result.shape[0]/100)
-    fig.savefig(save_dir + filename)
-    plt.close(fig)
-
+    result.save(save_dir + filename)
     return filename
 
 
@@ -590,25 +575,6 @@ def blur(img):
                 update_list.append((x, y, value))
     for i in update_list:
         img[i[1]][i[0]] = i[2]
-    return img
-
-
-def blur2(img):
-    width = img.shape[1]
-    height = img.shape[0]
-    tmp = np.full((1, 28), 1)
-    tmp2 = np.full((30, 1), 1)
-    img = np.vstack([img, tmp])
-    img = np.vstack([tmp, img])
-    img = np.hstack([img, tmp2])
-    img = np.hstack([tmp2, img])
-    for x in range(1, width-1):
-        for y in range(1, height-1):
-            value = img[y-1][x-1] + img[y][x-1] + img[y+1][x-1] \
-            + img[y-1][x] + img[y+1][x] + img[y-1][x+1] + img[y][x+1] + img[y+1][x+1]
-            value /= 8
-            if img[y][x] + 0.5 <value:
-                img[y][x] = value
     return img
 
 
