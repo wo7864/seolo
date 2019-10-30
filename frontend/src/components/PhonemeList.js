@@ -2,11 +2,6 @@ import React from 'react';
 import Pho_button from './pho_button';
 
 export default class PhonemeList extends React.Component {
-    constructor(props){
-        super(props);
-    }
-
-
     render(){
         let key = '';
         const data = this.props.latter_list.map((data2, i) =>{
