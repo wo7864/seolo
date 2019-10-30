@@ -1,5 +1,4 @@
 import React from 'react';
-import Pho_button from './pho_button';
 
 export default class PhonemeList extends React.Component {
     constructor(props){
@@ -19,7 +18,7 @@ export default class PhonemeList extends React.Component {
 
     render(){
         let html = '';
-        if(this.state.isHide == true){
+        if(this.state.isHide === true){
             html = 
             <div>
                 <button onClick={this.setHide}>용지 옵션 보기</button>
@@ -46,18 +45,18 @@ export default class PhonemeList extends React.Component {
                     onChange={this.props.handleChange}
                     name="image_height"/>
                 <br/>
-                <span>폰트 색상</span>
-                <select onChange={this.props.handleChange}>
-                    <option value="0">검정색</option>
-                    <option value="1">흰색</option>
-                    <option value="2">파란색</option>
-                </select>
-                <span>배경 색상</span>
-                <select onChange={this.props.handleChange}>
-                    <option value="0">흰색</option>
-                    <option value="1">검정색</option>
-                    <option value="2">노랑색</option>
-                </select>
+                <span>R</span>
+                <input value={this.props.color[0]} 
+                    onChange={this.props.set_color}
+                    name="red"/>
+                <span>G</span>
+                <input value={this.props.color[1]} 
+                    onChange={this.props.set_color}
+                    name="green"/>
+                <span>B</span>
+                <input value={this.props.color[2]} 
+                    onChange={this.props.set_color}
+                    name="blue"/>
                 <br/>
                 <button onClick={this.props.set_image_option}>
                     적용

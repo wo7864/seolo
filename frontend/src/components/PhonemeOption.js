@@ -1,13 +1,6 @@
 import React from 'react';
-import axios from 'axios';
-const domain = "http://127.0.0.1:5000/calligraphy";
 
 export default class Option extends React.Component {
-    constructor(props){
-        super(props);
-    }
-
-
     render(){
         const div_style={
             float:"left",
@@ -39,15 +32,12 @@ export default class Option extends React.Component {
                         onChange={this.props.change_value} onMouseUp={this.props.update_image}/><br/>
                 </div>
                 <div style={div_style}>
-                    <div style={move_div}>
-                        {ten_space}
-                        <button name="up" onClick={this.props.change_value} style={btn_style}>↑</button><br/>
-                        <button name="left" onClick={this.props.change_value} style={btn_style}>←</button>
-                        {ten_space}&nbsp;
-                        <button name="right" onClick={this.props.change_value} style={btn_style}>→</button><br/>
-                        {ten_space}
-                        <button name="down" onClick={this.props.change_value} style={btn_style}>↓</button>
-                    </div>
+                    <span>x</span>
+                    <input name="x" value={this.props.latter_list[this.props.latter][this.props.phoneme].x} 
+                        onChange={this.props.change_value}/><br/>
+                    <span>y</span>
+                    <input name="y" value={this.props.latter_list[this.props.latter][this.props.phoneme].y} 
+                        onChange={this.props.change_value}/><br/>
                     <br/>
                     <span>width &nbsp;&nbsp;</span>
                     <input type="range" name="width" value={this.props.latter_list[this.props.latter][this.props.phoneme].width} 

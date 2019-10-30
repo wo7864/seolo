@@ -2,10 +2,6 @@ import React from 'react';
 
 
 export default class ShowImage extends React.Component {
-    constructor(props){
-        super(props);
-
-    }
     render(){
         let filename = this.props.filename
 

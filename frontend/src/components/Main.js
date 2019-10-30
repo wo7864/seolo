@@ -27,7 +27,7 @@ export default class Main extends React.Component {
             definition:0,
             image_width:0,
             image_height:0,
-            color:0,
+            color:[0, 0, 0],
             background_color:0
         };
         this.create_image = this.create_image.bind(this);
@@ -35,6 +35,11 @@ export default class Main extends React.Component {
         this.select_phoneme = this.select_phoneme.bind(this);
         this.update_image = this.update_image.bind(this);
         this.change_value = this.change_value.bind(this);
+        this.set_color = this.set_color.bind(this);
+        this.update_image_option = this.update_image_option.bind(this);
+        this.update_phoneme_location = this.update_phoneme_location.bind(this);
+        this.update_phoneme_shape = this.update_phoneme_shape.bind(this);
+        this.update_phoneme_size = this.update_phoneme_size.bind(this);
     }
 
     create_image(){
@@ -47,12 +52,15 @@ export default class Main extends React.Component {
                 this.setState({
                     filename:response.data.filename+".png",
                     latter_list:response.data.latter_list,
+                    definition:response.data.definition,
+                    color:response.data.color,
+                    image_width:response.data.image_width,
+                    image_height:response.data.image_height,
                     page:1
                 })
                 console.log(response);
             })
             .catch( response => {console.log(response);});
-        
     }
 
     select_phoneme(latter_num, phoneme_num, phoneme){
@@ -86,27 +94,15 @@ export default class Main extends React.Component {
                     {[this.state.selected_latter]:{[this.state.selected_phoneme]:{$set: target}}})})
             }
             else{
-                if(e.target.name === 'up') {
-                    target.y--;
+                if(e.target.name === 'y') {
+                    target.y = e.target.value;
+                    this.setState({latter_list: update(this.state.latter_list, 
+                        {[this.state.selected_latter]:{[this.state.selected_phoneme]:{$set: target}}})})
+                }else if(e.target.name === 'x') {
+                    target.x = e.target.value;
                     this.setState({latter_list: update(this.state.latter_list, 
                         {[this.state.selected_latter]:{[this.state.selected_phoneme]:{$set: target}}})})
                 }
-                else if(e.target.name === 'down') {
-                    target.y++;
-                    this.setState({latter_list: update(this.state.latter_list, 
-                        {[this.state.selected_latter]:{[this.state.selected_phoneme]:{$set: target}}})})
-                }
-                else if(e.target.name === 'left') {
-                    target.x--;
-                    this.setState({latter_list: update(this.state.latter_list, 
-                        {[this.state.selected_latter]:{[this.state.selected_phoneme]:{$set: target}}})})
-                }
-                else if(e.target.name === 'right') {
-                    target.x++;
-                    this.setState({latter_list: update(this.state.latter_list, 
-                        {[this.state.selected_latter]:{[this.state.selected_phoneme]:{$set: target}}})})
-                }
-                this.update_image();
             }
         }
     }
@@ -117,16 +113,13 @@ export default class Main extends React.Component {
         this.setState(nextState);
     }
 
-    set_image_option(){
-        let data = this.state.latter_list;
-
-        axios.put(domain+'image', {
-            latter_list:[data],
+    update_image_option(){
+        axios.put(domain+'/image', {
+            latter_list:this.state.latter_list,
             definition:this.state.definition,
             image_width:this.state.image_width,
             image_height:this.state.image_height,
             color:this.state.color,
-            background_color:this.state.background_color
         })
             .then( response => {
                 this.setState({
@@ -157,6 +150,94 @@ export default class Main extends React.Component {
                 this.setState({
                     filename:response.data.filename+".png",
                     latter_list:response.data.latter_list
+                })
+            })
+            .catch( response => {console.log(response);});
+    }
+
+    update_phoneme_shape(){
+        axios.put(domain+'/shape', {
+            latter_list:this.state.latter_list,
+            latter_num: this.state.selected_latter,
+            phoneme_num: this.state.selected_phoneme,
+            input_text: this.state.input_text,
+            font:this.state.font,
+            definition:this.state.definition,
+            image_width:this.state.image_width,
+            image_height:this.state.image_height,
+            color:this.state.color
+        })
+            .then( response => {
+                this.setState({
+                    filename:response.data.filename+".png",
+                    latter_list:response.data.latter_list
+                })
+            })
+            .catch( response => {console.log(response);});    
+    }
+
+    update_phoneme_location(){
+        axios.put(domain+'/location', {
+            latter_list:this.state.latter_list,
+            input_text: this.state.input_text,
+            definition:this.state.definition,
+            image_width:this.state.image_width,
+            image_height:this.state.image_height,
+            color:this.state.color
+        })
+            .then( response => {
+                this.setState({
+                    filename:response.data.filename+".png",
+                    latter_list:response.data.latter_list
+                })
+            })
+            .catch( response => {console.log(response);});
+
+    }
+
+    update_phoneme_size(){
+        axios.put(domain+'/size', {
+            latter_list:this.state.latter_list,
+            latter_num: this.state.selected_latter,
+            phoneme_num: this.state.selected_phoneme,
+            input_text: this.state.input_text,
+            definition:this.state.definition,
+            image_width:this.state.image_width,
+            image_height:this.state.image_height,
+            color:this.state.color
+        })
+            .then( response => {
+                this.setState({
+                    filename:response.data.filename+".png",
+                    latter_list:response.data.latter_list
+                })
+            })
+            .catch( response => {console.log(response);});
+    }
+
+    set_color(e){
+        if(e.target.name == "red"){
+            this.setState({color: update(this.state.color, 
+                {[0]:{$set: e.target.value}})})
+        }
+        else if(e.target.name == "green"){
+            this.setState({color: update(this.state.color, 
+                {[1]:{$set: e.target.value}})})
+        }else{
+            this.setState({color: update(this.state.color, 
+                {[2]:{$set: e.target.value}})})
+        }
+    }
+
+    update_background_image(){
+        
+        axios.put(domain+'/background', {
+            filename:this.state.filename,
+            background_image:this.state.background_image
+        })
+            .then( response => {
+                this.setState({
+                    bg_filename:response.data.filename
                 })
             })
             .catch( response => {console.log(response);});
@@ -193,6 +274,8 @@ export default class Main extends React.Component {
                     image_height={this.state.image_height}
                     handleChange={this.handleChange}
                     set_image_option={this.set_image_option}
+                    color={this.state.color}
+                    set_color={this.set_color}
                 />
                 <PhonemeList 
                     update_image={this.update_image}
