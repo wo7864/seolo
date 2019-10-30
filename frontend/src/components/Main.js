@@ -6,16 +6,16 @@ import PhonemeOption from './PhonemeOption';
 import ImageOption from './ImageOption';
 import update from 'react-addons-update';
 
-const domain = "http://52.79.89.171:5000/calligraphy";
 //const domain ="http://127.0.0.1:5000/calligraphy";
 import InputText from './InputText';
 import SetBackGroundImage from './SetBackGroundImage';
+const domain = "http://15.164.227.195:5000/calligraphy";
 
 export default class Main extends React.Component {
     constructor(props){
         super(props);
         this.state={
-            page:1,
+            page:0,
             font:0,
             input_text:'',
             latter_list:[],
