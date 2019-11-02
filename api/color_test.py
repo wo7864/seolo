@@ -34,11 +34,11 @@ def set_color(result, color):
 img = cv2.imread("test.png", cv2.IMREAD_GRAYSCALE)
 img = img[:]/255
 img2 = set_color(img, [10, 20, 30])
-img3 = Image.open("bg_test.jpg").convert('RGBA').resize((img2.size[0], img2.size[1]))
+img3 = Image.open("배경.jpg").convert('RGBA').resize((img2.size[0], img2.size[1]))
 img4 = img3
 img3.paste(img2, (0, 0), img2)
 img3.save("test2.png")
 
-img2 = set_color(img, 16, 150, 200)
-img4.paste(img2, (100, 0), img2)
+img2 = set_color(img, [0, 0, 0])
+img4.paste(img2, (100, 50), img2)
 img4.save("test3.png")

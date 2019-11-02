@@ -1,70 +1,12 @@
-from keras.models import model_from_json
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.gridspec as gridspec
-from random import *
-import csv
 import cv2
-import time
 from PIL import Image
-import os
-import tensorflow as tf
-import infogan
 from datetime import datetime
-from urllib import parse
-import json
+import os
 
 # 만든 모델 리스트
 phoneme_list = ['ㄱ', 'ㄴ', 'ㄷ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅅ', 'ㅇ', 'ㅈ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ', 'ㅏ', 'ㅑ', 'ㅔ', 'ㅐ'
     , 'ㅓ', 'ㅕ', 'ㅣ', 'ㅗ', 'ㅛ', 'ㅜ', 'ㅠ', 'ㅡ', ' ', '\n']
-
-
-def load_model(font):
-    sess_list = []
-    model_list = []
-    for phoneme in range(1, 27):
-        tf.reset_default_graph()
-        sess = tf.Session()
-        model = infogan.GAN(sess)
-        model.saver.restore(sess, "./infogan_model/{}/{}_{}_{}.ckpt".format(phoneme, font, phoneme, '300'))
-        model_list.append(model)
-    sess_list.append(sess)
-    return model_list, sess_list
-
-
-def plot(samples):
-    fig = plt.figure(figsize=(10, 10))
-    gs = gridspec.GridSpec(10, 10)
-    gs.update(wspace=0.05, hspace=0.05)
-
-    for i, sample in enumerate(samples):
-        ax = plt.subplot(gs[i])
-        plt.axis('off')
-        ax.set_xticklabels([])
-        ax.set_yticklabels([])
-        ax.set_aspect('equal')
-        plt.imshow(sample.reshape(28, 28), cmap='Greys_r')
-    plt.tight_layout()
-
-    return fig
-
-
-def ready():
-    print("loading model...")
-    font_list = ['bangwool', 'bangwool_b', 'baram', 'baram_b', 'bawi', 'bawi_b', 'bburi', 'bidan', 'bidan_b', 'bori',
-                 'bori_b', 'buddle', 'buddle_b', 'dasle', 'goorm', 'groom_b', 'jandi', 'janggun', 'namu',
-                 'namu_b', 'namu_c', 'sandle', 'seassack', 'seassack_b', 'sonmut', 'sonmut_b', 'taepoong', 'yetdol']
-    font_list = ['bangwool']
-
-    model_list = []
-    sess_list = []
-    for i in font_list:
-        model, sess = load_model(i)
-        model_list.append(model)
-        sess_list.append(sess)
-    print("complate!")
-    return font_list, model_list, sess_list
-
 
 '''
 shape 종류
@@ -97,9 +39,8 @@ shape 종류
 23: 모음: ㅖ, ㅒ       // 종성 2개
 '''
 
-
 class Phoneme:
-    def __init__(self, img, shape, latter_num, phoneme_num, x_point, y_point, param_list, phoneme, width, height):
+    def __init__(self, img, shape, latter_num, phoneme_num, x_point, y_point, param_list, phoneme, width, height, rotation):
         # shape 은 0~8까지. 모음과 종성의 개수에 따라 달라진다.
         self.shape = shape
         # 몇번째 글자인지.
@@ -108,282 +49,265 @@ class Phoneme:
         self.phoneme_num = phoneme_num
         # 파라미터 리스트. 총 5의 크기를 가지며 각 param은 -1~1의 값을 갖는다.
         self.param_list = param_list
-        self.x = 0
-        self.y = 0
+        self.x = x_point
+        self.y = y_point
         self.img = img
         self.phoneme = phoneme
         self.width = width
         self.height = height
+        self.rotation = rotation
+
+    def set_location(self):
         value = [x*7 for x in range(1, 10)]
+        if self.shape == 0:
+            if self.phoneme_num == 0:
+                self.y += value[2]
+            elif self.phoneme_num == 2:
+                self.x += value[3]
+                self.y += value[2]
+        elif self.shape == 1:
+            if self.phoneme_num == 0:
+                self.y += value[0]
+            elif self.phoneme_num == 2:
+                self.x += value[3]
+                self.y += value[0]
+            elif self.phoneme_num == 4:
+                self.x += value[3]
+                self.y += value[5]
+        elif self.shape == 2:
+            if self.phoneme_num == 0:
+                pass
+            elif self.phoneme_num == 2:
+                self.x += value[5]
+            elif self.phoneme_num == 4:
+                self.y += value[5]
+            elif self.phoneme_num == 5:
+                self.x += value[3]
+                self.y += value[5]
+        elif self.shape == 3:
+            if self.phoneme_num == 0:
+                self.y += value[2]
+            elif self.phoneme_num == 2:
+                self.y += value[4]
+        elif self.shape == 4:
+            if self.phoneme_num == 0:
+                pass
+            elif self.phoneme_num == 2:
+                self.y += value[3]
+            elif self.phoneme_num == 4:
+                self.y += value[6]
+        elif self.shape == 5:
+            if self.phoneme_num == 0:
+                pass
+            elif self.phoneme_num == 2:
+                self.y += value[3]
+            elif self.phoneme_num == 4:
+                self.y += value[6]
+            elif self.phoneme_num == 5:
+                self.x += value[3]
+                self.y += value[6]
+        elif self.shape == 6:
+            if self.phoneme_num == 0:
+                self.y += value[3]
+            elif self.phoneme_num == 2:
+                self.y += value[5]
+            elif self.phoneme_num == 3:
+                self.x += value[5]
+                self.y += value[3]
+        elif self.shape == 7:
+            if self.phoneme_num == 0:
+                pass
+            elif self.phoneme_num == 2:
+                self.y += value[3]
+            elif self.phoneme_num == 3:
+                self.x += value[5]
+            elif self.phoneme_num == 4:
+                self.x += value[5]
+                self.y += value[5]
+        elif self.shape == 8:
+            if self.phoneme_num == 0:
+                pass
+            elif self.phoneme_num == 2:
+                self.y += value[3]
+            elif self.phoneme_num == 3:
+                self.x += value[3]
+            elif self.phoneme_num == 4:
+                self.y += value[6]
+            elif self.phoneme_num == 5:
+                self.x += value[3]
+                self.y += value[6]
+        elif self.shape == 9:
+            if self.phoneme_num == 0:
+                self.y += value[2]
+            elif self.phoneme_num == 2:
+                self.x += value[3]
+                self.y += value[2]
+            elif self.phoneme_num == 3:
+                self.x += value[4]
+        elif self.shape == 10:
+            if self.phoneme_num == 0:
+                self.y += value[0]
+            elif self.phoneme_num == 2:
+                self.x += value[3]
+                self.y += value[0]
+            elif self.phoneme_num == 3:
+                self.x += value[4]
+            elif self.phoneme_num == 4:
+                self.x += value[3]
+                self.y += value[5]
+        elif self.shape == 11:
+            if self.phoneme_num == 0:
+                pass
+            elif self.phoneme_num == 2:
+                self.x += value[3]
+            elif self.phoneme_num == 3:
+                self.x += value[4]
+            elif self.phoneme_num == 4:
+                self.y += value[5]
+            elif self.phoneme_num == 5:
+                self.x += value[3]
+                self.y += value[5]
+        elif self.shape == 12:
+            if self.phoneme_num == 0:
+                self.y += value[2]
+            elif self.phoneme_num == 1:
+                self.x += value[2]
+                self.y += value[2]
+            elif self.phoneme_num == 2:
+                self.x += value[4]
+                self.y += value[2]
+        elif self.shape == 13:
+            if self.phoneme_num == 0:
+                self.y += value[0]
+            elif self.phoneme_num == 1:
+                self.x += value[2]
+                self.y += value[0]
+            elif self.phoneme_num == 2:
+                self.x += value[4]
+                self.y += value[0]
+            elif self.phoneme_num == 4:
+                self.x += value[3]
+                self.y += value[5]
+        elif self.shape == 14:
+            if self.phoneme_num == 0:
+                self.y += value[0]
+            elif self.phoneme_num == 1:
+                self.x += value[2]
+                self.y += value[0]
+            elif self.phoneme_num == 2:
+                self.x += value[4]
+            elif self.phoneme_num == 4:
+                self.y += value[5]
+            elif self.phoneme_num == 5:
+                self.x += value[3]
+                self.y += value[5]
+        elif self.shape == 15:
+            if self.phoneme_num == 0:
+                self.y += value[2]
+            elif self.phoneme_num == 1:
+                self.x += value[2]
+                self.y += value[2]
+            elif self.phoneme_num == 2:
+                self.y += value[4]
+        elif self.shape == 16:
+            if self.phoneme_num == 0:
+                pass
+            elif self.phoneme_num == 1:
+                self.x += value[2]
+            elif self.phoneme_num == 2:
+                self.y += value[3]
+            elif self.phoneme_num == 4:
+                self.y += value[6]
+        elif self.shape == 17:
+            if self.phoneme_num == 0:
+                pass
+            elif self.phoneme_num == 1:
+                self.x += value[2]
+            elif self.phoneme_num == 2:
+                self.y += value[3]
+            elif self.phoneme_num == 4:
+                self.y += value[6]
+            elif self.phoneme_num == 5:
+                self.x += value[3]
+                self.y += value[6]
+        elif self.shape == 18:
+            if self.phoneme_num == 0:
+                self.y += value[3]
+            elif self.phoneme_num == 1:
+                self.x += value[2]
+                self.y += value[3]
+            elif self.phoneme_num == 2:
+                self.y += value[5]
+            elif self.phoneme_num == 3:
+                self.x += value[5]
+                self.y += value[3]
+        elif self.shape == 19:
+            if self.phoneme_num == 0:
+                pass
+            elif self.phoneme_num == 1:
+                self.x += value[2]
+            elif self.phoneme_num == 2:
+                self.y += value[3]
+            elif self.phoneme_num == 3:
+                self.x += value[5]
+            elif self.phoneme_num == 4:
+                self.x += value[5]
+                self.y += value[5]
+        elif self.shape == 20:
+            if self.phoneme_num == 0:
+                pass
+            elif self.phoneme_num == 1:
+                self.x += value[2]
+            elif self.phoneme_num == 2:
+                self.y += value[3]
+            elif self.phoneme_num == 3:
+                self.x += value[3]
+            elif self.phoneme_num == 4:
+                self.y += value[6]
+            elif self.phoneme_num == 5:
+                self.x += value[3]
+                self.y += value[6]
+        elif self.shape == 21:
+            if self.phoneme_num == 0:
+                self.y += value[2]
+            elif self.phoneme_num == 1:
+                self.x += value[2]
+                self.y += value[2]
+            elif self.phoneme_num == 2:
+                self.x += value[3]
+                self.y += value[2]
+            elif self.phoneme_num == 3:
+                self.x += value[4]
+        elif self.shape == 22:
+            if self.phoneme_num == 0:
+                self.y += value[0]
+            elif self.phoneme_num == 1:
+                self.x += value[2]
+                self.y += value[0]
+            elif self.phoneme_num == 2:
+                self.x += value[3]
+                self.y += value[0]
+            elif self.phoneme_num == 3:
+                self.x += value[4]
+            elif self.phoneme_num == 4:
+                self.x += value[3]
+                self.y += value[5]
+        elif self.shape == 23:
+            if self.phoneme_num == 0:
+                self.y += value[0]
+            elif self.phoneme_num == 1:
+                self.x += value[2]
+                self.y += value[0]
+            elif self.phoneme_num == 2:
+                self.x += value[3]
+            elif self.phoneme_num == 3:
+                self.x += value[4]
+            elif self.phoneme_num == 4:
+                self.y += value[5]
+            elif self.phoneme_num == 5:
+                self.x += value[3]
+                self.y += value[5]
 
-        if shape == 0:
-            if phoneme_num == 0:
-                self.y = value[2]
-            elif phoneme_num == 2:
-                self.x = value[3]
-                self.y = value[2]
-        elif shape == 1:
-            if phoneme_num == 0:
-                self.y = value[0]
-            elif phoneme_num == 2:
-                self.x = value[3]
-                self.y = value[0]
-            elif phoneme_num == 4:
-                self.x = value[3]
-                self.y = value[5]
-        elif shape == 2:
-            if phoneme_num == 0:
-                pass
-            elif phoneme_num == 2:
-                self.x = value[5]
-            elif phoneme_num == 4:
-                self.y = value[5]
-            elif phoneme_num == 5:
-                self.x = value[3]
-                self.y = value[5]
-        elif shape == 3:
-            if phoneme_num == 0:
-                self.y = value[2]
-            elif phoneme_num == 2:
-                self.y = value[4]
-        elif shape == 4:
-            if phoneme_num == 0:
-                pass
-            elif phoneme_num == 2:
-                self.y = value[3]
-            elif phoneme_num == 4:
-                self.y = value[6]
-        elif shape == 5:
-            if phoneme_num == 0:
-                pass
-            elif phoneme_num == 2:
-                self.y = value[3]
-            elif phoneme_num == 4:
-                self.y = value[6]
-            elif phoneme_num == 5:
-                self.x = value[3]
-                self.y = value[6]
-        elif shape == 6:
-            if phoneme_num == 0:
-                self.y = value[3]
-            elif phoneme_num == 2:
-                self.y = value[5]
-            elif phoneme_num == 3:
-                self.x = value[5]
-                self.y = value[3]
-        elif shape == 7:
-            if phoneme_num == 0:
-                pass
-            elif phoneme_num == 2:
-                self.y = value[3]
-            elif phoneme_num == 3:
-                self.x = value[5]
-            elif phoneme_num == 4:
-                self.x = value[5]
-                self.y = value[5]
-        elif shape == 8:
-            if phoneme_num == 0:
-                pass
-            elif phoneme_num == 2:
-                self.y = value[3]
-            elif phoneme_num == 3:
-                self.x = value[3]
-            elif phoneme_num == 4:
-                self.y = value[6]
-            elif phoneme_num == 5:
-                self.x = value[3]
-                self.y = value[6]
-        elif shape == 9:
-            if phoneme_num == 0:
-                self.y = value[2]
-            elif phoneme_num == 2:
-                self.x = value[3]
-                self.y = value[2]
-            elif phoneme_num == 3:
-                self.x = value[4]
-        elif shape == 10:
-            if phoneme_num == 0:
-                self.y = value[0]
-            elif phoneme_num == 2:
-                self.x = value[3]
-                self.y = value[0]
-            elif phoneme_num == 3:
-                self.x = value[4]
-            elif phoneme_num == 4:
-                self.x = value[3]
-                self.y = value[5]
-        elif shape == 11:
-            if phoneme_num == 0:
-                pass
-            elif phoneme_num == 2:
-                self.x = value[3]
-            elif phoneme_num == 3:
-                self.x = value[4]
-            elif phoneme_num == 4:
-                self.y = value[5]
-            elif phoneme_num == 5:
-                self.x = value[3]
-                self.y = value[5]
-        elif shape == 12:
-            if phoneme_num == 0:
-                self.y = value[2]
-            elif phoneme_num == 1:
-                self.x = value[2]
-                self.y = value[2]
-            elif phoneme_num == 2:
-                self.x = value[4]
-                self.y = value[2]
-        elif shape == 13:
-            if phoneme_num == 0:
-                self.y = value[0]
-            elif phoneme_num == 1:
-                self.x = value[2]
-                self.y = value[0]
-            elif phoneme_num == 2:
-                self.x = value[4]
-                self.y = value[0]
-            elif phoneme_num == 4:
-                self.x = value[3]
-                self.y = value[5]
-        elif shape == 14:
-            if phoneme_num == 0:
-                self.y = value[0]
-            elif phoneme_num == 1:
-                self.x = value[2]
-                self.y = value[0]
-            elif phoneme_num == 2:
-                self.x = value[4]
-            elif phoneme_num == 4:
-                self.y = value[5]
-            elif phoneme_num == 5:
-                self.x = value[3]
-                self.y = value[5]
-        elif shape == 15:
-            if phoneme_num == 0:
-                self.y = value[2]
-            elif phoneme_num == 1:
-                self.x = value[2]
-                self.y = value[2]
-            elif phoneme_num == 2:
-                self.y = value[4]
-        elif shape == 16:
-            if phoneme_num == 0:
-                pass
-            elif phoneme_num == 1:
-                self.x = value[2]
-            elif phoneme_num == 2:
-                self.y = value[3]
-            elif phoneme_num == 4:
-                self.y = value[6]
-        elif shape == 17:
-            if phoneme_num == 0:
-                pass
-            elif phoneme_num == 1:
-                self.x = value[2]
-            elif phoneme_num == 2:
-                self.y = value[3]
-            elif phoneme_num == 4:
-                self.y = value[6]
-            elif phoneme_num == 5:
-                self.x = value[3]
-                self.y = value[6]
-        elif shape == 18:
-            if phoneme_num == 0:
-                self.y = value[3]
-            elif phoneme_num == 1:
-                self.x = value[2]
-                self.y = value[3]
-            elif phoneme_num == 2:
-                self.y = value[5]
-            elif phoneme_num == 3:
-                self.x = value[5]
-                self.y = value[3]
-        elif shape == 19:
-            if phoneme_num == 0:
-                pass
-            elif phoneme_num == 1:
-                self.x = value[2]
-            elif phoneme_num == 2:
-                self.y = value[3]
-            elif phoneme_num == 3:
-                self.x = value[5]
-            elif phoneme_num == 4:
-                self.x = value[5]
-                self.y = value[5]
-        elif shape == 20:
-            if phoneme_num == 0:
-                pass
-            elif phoneme_num == 1:
-                self.x = value[2]
-            elif phoneme_num == 2:
-                self.y = value[3]
-            elif phoneme_num == 3:
-                self.x = value[3]
-            elif phoneme_num == 4:
-                self.y = value[6]
-            elif phoneme_num == 5:
-                self.x = value[3]
-                self.y = value[6]
-        elif shape == 21:
-            if phoneme_num == 0:
-                self.y = value[2]
-            elif phoneme_num == 1:
-                self.x = value[2]
-                self.y = value[2]
-            elif phoneme_num == 2:
-                self.x = value[3]
-                self.y = value[2]
-            elif phoneme_num == 3:
-                self.x = value[4]
-        elif shape == 22:
-            if phoneme_num == 0:
-                self.y = value[0]
-            elif phoneme_num == 1:
-                self.x = value[2]
-                self.y = value[0]
-            elif phoneme_num == 2:
-                self.x = value[3]
-                self.y = value[0]
-            elif phoneme_num == 3:
-                self.x = value[4]
-            elif phoneme_num == 4:
-                self.x = value[3]
-                self.y = value[5]
-        elif shape == 23:
-            if phoneme_num == 0:
-                self.y = value[0]
-            elif phoneme_num == 1:
-                self.x = value[2]
-                self.y = value[0]
-            elif phoneme_num == 2:
-                self.x = value[3]
-            elif phoneme_num == 3:
-                self.x = value[4]
-            elif phoneme_num == 4:
-                self.y = value[5]
-            elif phoneme_num == 5:
-                self.x = value[3]
-                self.y = value[5]
-        self.x += x_point
-        self.y += y_point
-
-'''
-class latter:
-    def __init__(self, pho_list):
-        self.left = 9999999999
-        self.right = 0
-        self.top = 999999999
-        self.bottom = 0
-        for pho in pho_list:
-            if pho.img.shape[1] + pho.x > self.right:
-                self.right = pho.img.shape[1] + pho.x
-            if pho.x < self.left:
-                self.left = pho.x
-            if pho.img.shape[0] + pho.y > self.bottom:
-                self.bottom = pho.img.shape[0] + pho.y
-            if pho.y < self.top:
-                self.top = pho.y
-'''
 
 def add_image(paper, image, width_point, height_point):
     for idx_i, val_i in enumerate(image):
@@ -395,31 +319,25 @@ def add_image(paper, image, width_point, height_point):
     return paper
 
 
-def set_definition(result, definition):
-    definition = (100 - definition) / 100
+def set_definition(result, definition=100):
+    definition = definition / 200
     # definition: 0~1
     for idx, i in enumerate(result):
         for idx2, j in enumerate(i):
-            if j < definition * -1:
-                result[idx][idx2] = -1
-            elif j >= definition:
+            if j > 1-definition:
                 result[idx][idx2] = 1
+            elif j <= definition:
+                result[idx][idx2] = 0
     return result
 
 
-def set_invisibility(result, color):
-    tmp = np.full([result.shape[0], result.shape[1]], 1.0)
-    for idx, i in enumerate(result):
-        for idx2, j in enumerate(i):
-            if color == 0:
-                if j == 1:
-                    tmp[idx][idx2] = 1 - j
-            else:
-                if j == -1:
-                    tmp[idx][idx2] = 1 + j
-
-    result = cv2.merge((result, result, result, tmp))
+def normalization(result):
+    min_value = np.min(result)
+    result = result[:] - min_value
+    max_value = np.max(result)
+    result = result[:] / max_value
     return result
+
 
 def json_to_obj(text):
     latter_list = []
@@ -428,7 +346,7 @@ def json_to_obj(text):
         for phoneme in latter:
             phoneme_list2.append(Phoneme(np.array(phoneme['img']), phoneme['shape_list'], phoneme['latter_num'],
                                  phoneme['phoneme_num'], phoneme['x'], phoneme['y'], phoneme['params'],
-                                 phoneme['phoneme'], phoneme['width'], phoneme['height']))
+                                 phoneme['phoneme'], phoneme['width'], phoneme['height'], phoneme['rotation']))
         latter_list.append(phoneme_list2)
     return latter_list
 
@@ -439,7 +357,7 @@ def create_latter_list(font, model_list, sess_list, text, shape_list, param_list
     small_list = [3, 4, 5, 15, 16, 17]
     x_point = 0
     y_point = 0
-    pre_pho = None
+    rotation = 0
     json_latter_list = []
     for idx, latter in enumerate(text):
         phoneme_list2 = []
@@ -447,20 +365,23 @@ def create_latter_list(font, model_list, sess_list, text, shape_list, param_list
         for idx2, pho in enumerate(latter):
             if text[idx][idx2] != 26:
                 img = gen_image(pho, model_list[font][pho], sess_list[font][pho], param_list2)
-                phoneme_list2.append(Phoneme(img, shape_list[idx], idx, idx2, x_point, y_point,
-                                             param_list2, phoneme_list[text[idx][idx2]], img.shape[1], img.shape[0]))
-                param_list = [0] * 4
+                phoneme = Phoneme(img, shape_list[idx], idx, idx2, x_point, y_point,
+                                  param_list2, phoneme_list[text[idx][idx2]], img.shape[1], img.shape[0], rotation)
+                phoneme.set_location()
+                phoneme_list2.append(phoneme)
+                param_list = [50] * 4
                 json_pho = {
                     "img": img.tolist(),
                     "shape_list": shape_list[idx],
                     "latter_num": idx,
                     "phoneme_num": idx2,
-                    "x": x_point,
-                    "y": y_point,
+                    "x": phoneme.x,
+                    "y": phoneme.y,
                     "params": param_list,
                     "phoneme": phoneme_list[text[idx][idx2]],
-                    "width":img.shape[1],
-                    "height":img.shape[0]
+                    "width": img.shape[1],
+                    "height": img.shape[0],
+                    "rotation": rotation
                 }
                 json_pho_list.append(json_pho)
             else:
@@ -474,7 +395,7 @@ def create_latter_list(font, model_list, sess_list, text, shape_list, param_list
         json_latter_list.append(json_pho_list)
     return latter_list, json_latter_list
 
-
+'''
 def set_color(result, color):
     r = np.full([result.shape[0], result.shape[1]], color[0])
     g = np.full([result.shape[0], result.shape[1]], color[1])
@@ -488,9 +409,44 @@ def set_color(result, color):
     result = result.astype(np.uint8)
     result = Image.fromarray(result, 'RGBA')
     return result
+'''
+
+def set_color_rgba(result, color):
+    r = np.full([result.shape[0], result.shape[1]], color[0])
+    g = np.full([result.shape[0], result.shape[1]], color[1])
+    b = np.full([result.shape[0], result.shape[1]], color[2])
+    r = r[:] / 1
+    g = g[:] / 1
+    b = b[:] / 1
+    result = 1 - result[:]
+    result = result[:] * 255
+    img2 = []
+    for i in range(result.shape[0]):
+        tmp = []
+        for j in range(result.shape[1]):
+            tmp.append([r[i][j], g[i][j], b[i][j], result[i][j]])
+        img2.append(tmp)
+    img2 = np.array(img2)
+    result = img2.astype(np.uint8)
+    result = Image.fromarray(result, 'RGBA')
+    return result
 
 
-def img_attach(latter_list, definition, color, ori_text, image_width=None, image_height=None):
+def set_color_rgb(result):
+    result = result[:] * 255
+    img2 = []
+    for i in range(result.shape[0]):
+        tmp = []
+        for j in range(result.shape[1]):
+            tmp.append([result[i][j], result[i][j], result[i][j]])
+        img2.append(tmp)
+    img2 = np.array(img2)
+    result = img2.astype(np.uint8)
+    result = Image.fromarray(result, 'RGB')
+    return result
+
+
+def img_attach(latter_list, definition, color, is_invisiable, ori_text, bg_data, image_width=None, image_height=None):
     left = 9999999999
     right = 0
     top = 999999999
@@ -522,8 +478,8 @@ def img_attach(latter_list, definition, color, ori_text, image_width=None, image
                     if pho.img != "":
                         pho.y += 0-top
 
-    width = right - left
-    height = bottom - top
+    width = right
+    height = bottom
     if height < 84:
         height = 84
     result = np.zeros((height+1, width+1))
@@ -540,115 +496,105 @@ def img_attach(latter_list, definition, color, ori_text, image_width=None, image
         image_width = result.shape[1] * 5
     if not image_height:
         image_height = result.shape[0] * 5
+
     # 각 길이를 5배로 확장
     result = cv2.resize(result, (image_width, image_height), interpolation=cv2.INTER_LINEAR)
 
-    # 선명도 조절
-    result = set_definition(result, definition)
-
     # 색 지정
-    result = set_color(result, color)
+    if is_invisiable:
+        result = set_color_rgba(result, color)
+    else:
+        result = set_color_rgb(result)
 
     now = datetime.now()
-    filename = ori_text + now.strftime("_%m_%d_%Y_%H_%M_%S.png")
+    filename = ori_text + now.strftime("%m_%d_%Y_%H_%M_%S.png")
     save_dir = 'static/image/'
     result.save(save_dir + filename)
-    return filename
+    com = 's3cmd put ./static/image/{} s3://seolo/static/image/'.format(filename)
+    os.system(com)
+
+    cb_filename = ''
+    if bg_data:
+        bg_file = Image.open(save_dir + bg_data[0])
+        cb_filename = combine_bg(result, bg_file, ori_text, bg_data[1], bg_data[2])
+        com = 's3cmd put ./static/image/{} s3://seolo/static/image/'.format(cb_filename)
+        os.system(com)
+
+    return filename, cb_filename, image_width, image_height
 
 
-def blur(img):
+def blur(img, limit=0.5):
     width = img.shape[1]
     height = img.shape[0]
-    tmp = np.full((1, 28), 1)
-    tmp2 = np.full((30, 1), 1)
+    tmp = np.full((1, width), 1)
+    tmp2 = np.full((height+2, 1), 1)
     img = np.vstack([img, tmp])
     img = np.vstack([tmp, img])
     img = np.hstack([img, tmp2])
     img = np.hstack([tmp2, img])
     update_list = []
-    for x in range(1, width-1):
-        for y in range(1, height-1):
-            value = img[y-1][x-1] + img[y][x-1] + img[y+1][x-1] \
-            + img[y-1][x] + img[y+1][x] + img[y-1][x+1] + img[y][x+1] + img[y+1][x+1]
+    for x in range(1, width+1):
+        for y in range(1, height+1):
+            value = img[y-1][x-1] + img[y][x-1] + img[y+1][x-1] + img[y-1][x] + img[y+1][x] + img[y-1][x+1] + \
+                    img[y][x+1] + img[y+1][x+1]
             value /= 8
-            if img[y][x] + 0.5 <value:
+            if limit < value:
                 update_list.append((x, y, value))
     for i in update_list:
-        img[i[1]][i[0]] = i[2]
+        img[i[1]][i[0]] = limit+0.1
+    return img
+
+
+def remove_noise(img, size=5):
+    width = img.shape[1]
+    height = img.shape[0]
+    degree = 0.4
+    for x in range(width-size):
+        for y in range(height-size):
+            swi = 0
+            for i in range(size+1):
+                if not (img[y][x+i] < degree and img[y+size][x+i] < degree and img[y+i][x] < degree and img[y+i][x+size] < degree):
+                    swi = 1
+            if swi == 0:
+                img[y+1:y+size][x+1:x+size] = 0
     return img
 
 
 def gen_image(text, model, sess, param_list):
-    num_generate = 1
     if text < 26:
-        #noise = model.Generate_noise(1)  # noise = (num_generate, model.noise_dim)
         noise = np.full((1, 62), 0)
-        noise = np.tile(noise, [num_generate, 1])
-        latent_code = np.zeros([num_generate, 4])
+        noise = np.tile(noise, [1, 1])
+        latent_code = np.zeros([1, 4])
         for idx, param in enumerate(param_list):
             latent_code[:, idx] = param
         generated = sess.run(model.Gen, {  # num_generate, 28, 28, 1
             model.noise_source: noise, model.latent_code: latent_code, model.is_train: False
         }
-                                 )
+        )
         img = np.reshape(generated, (model.height, model.width))  # 이미지 형태로. #num_generate, height, width
+
+        width = int(img.shape[1] / 4)
+        height = int(img.shape[0] / 4)
+        tmp = np.full((width, width*4), 1)
+        tmp2 = np.full((height*4 + (width * 2), height), 1)
+        img = np.vstack([img, tmp])
+        img = np.vstack([tmp, img])
+        img = np.hstack([img, tmp2])
+        img = np.hstack([tmp2, img])
+
+        img = normalization(img)
         img = blur(img)
+        img = set_definition(img)
         return img
     else:
         return ''
 
-def remove_noise(img):
-    print(img)
-    width = img.shape[1]
-    height = img.shape[0]
-    val = 4
-    for x in range(width-val):
-        for y in range(height-val):
-            swi = 0
-            for i in range(val):
-                if img[y][x+i] <= 1.0:
-                        swi = 1
-                if img[y+val][x+i] <= 1.0:
-                        swi = 1
-                if img[y+i][x] <= 1.0:
-                        swi = 1
-                if img[y+i][x+val] <= 1.0:
-                        swi = 1
-            if swi == 0:
-                img[y+1:y+val][x+1:x+val] = 1
-    return img
-'''
-def gen_image(font, text_list, model_list, sess_list, param_list):
-    start_value = 1
-    num_generate = 1
-    imgs = []
-    for text in text_list:
-        latter = []
-        for i in text:
-            if i < 26:
-                model = model_list[int(i)]
-                sess = sess_list[int(i)]
-                noise = model.Generate_noise(1)  # noise = (num_generate, model.noise_dim)
-                noise = np.tile(noise, [num_generate, 1])
 
-                space = 10
-                c = np.linspace(start_value, -start_value, space)  # start_value ~ -start_value를 num_generate 등분.
-
-                latent_code = np.zeros([num_generate, 5])
-                for idx, param in enumerate(param_list):
-                    latent_code[:, idx] = param
-                generated = sess.run(model.Gen, {  # num_generate, 28, 28, 1
-                    model.noise_source: noise, model.latent_code: latent_code, model.is_train: False
-                }
-                                     )
-                generated = np.reshape(generated,
-                                       (model.height, model.width))  # 이미지 형태로. #num_generate, height, width
-                latter.append(generated)
-            else:
-                latter.append("")
-        imgs.append(latter)
-    return imgs
-'''
+def update_rotation(img2, rotation):
+    img2 = img2.astype(np.uint8)
+    matrix = cv2.getRotationMatrix2D((img2.shape[1]/2, img2.shape[0]/2), int(rotation), 1)
+    img2 = cv2.warpAffine(img2, matrix, (img2.shape[1], img2.shape[0]),  borderMode=cv2.BORDER_REPLICATE)
+    return img2
 
 
 def create_one_image(phoneme, model, sess):
@@ -661,6 +607,17 @@ def create_one_image(phoneme, model, sess):
         model.noise_source: noise, model.latent_code: latent_code, model.is_train: False
     })
     img = np.reshape(generated, (model.height, model.width))  # 이미지 형태로. #num_generate, height, width
+    width = int(img.shape[1] / 4)
+    height = int(img.shape[0] / 4)
+    tmp = np.full((width, width * 4), 1)
+    tmp2 = np.full((height * 4 + (width * 2), height), 1)
+    img = np.vstack([img, tmp])
+    img = np.vstack([tmp, img])
+    img = np.hstack([img, tmp2])
+    img = np.hstack([tmp2, img])
+    img = normalization(img)
+    img = blur(img)
+    img = set_definition(img)
     return img
 
 
@@ -741,23 +698,19 @@ def convert_text(korean_word):
     return r_lst, shape_list
 
 
-def main(model_list, sess_list, ori_text, latter_attach, definition, color, filename):
+def bg_file_save(bg_file, text):
+    save_dir = 'static/image/'
+    now = datetime.now()
+    filename = 'bg_' + text + now.strftime("_%m_%d_%Y_%H_%M_%S.png")
+    background_image = Image.open(bg_file)
+    background_image.save(save_dir + filename)
+    return filename
 
-    text, shape_list = convert_text(ori_text)
-    param_list = [50] * 5
-    param_list = [(x/50)-1 for x in param_list]
-    #generated_images = gen_image(0, text, model_list[0], sess_list[0], param_list)
-    latter_list = create_latter_list(model_list[0], sess_list[0], text, shape_list, param_list)
-    result = img_attach(latter_list, latter_attach, definition, color, ori_text)
-    #img = create_one_image(font, model_list, 7)
-    #generated_images[0][0] = img
-    #latter_list[0][0].y += 10
 
-if __name__ == "__main__":
-    font_list, model_list, sess_list = ready()
-    input_text = "안녕하세요"
-    fontList = [0, 1, 2]
-    latter_attach_list = [50, 75, 100]
-    definition_list = [10, 50, 100]
-    color_list = [0, 1]
-    main(model_list, sess_list, input_text, latter_attach_list[0], definition_list[0], color_list[0], "test")
+def combine_bg(result, bg_file, text, x=0, y=0):
+    save_dir = 'static/image/'
+    now = datetime.now()
+    bg_file.paste(result, (x, y), result)
+    filename = "cb_" + text + now.strftime("_%m_%d_%Y_%H_%M_%S.png")
+    bg_file.save(save_dir + filename)
+    return filename

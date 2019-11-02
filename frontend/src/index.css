@@ -1,8 +1,7 @@
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
+  font-family: 'Noto Sans KR', sans-serif;
+
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -10,4 +9,21 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
+}
+
+h1, h2, h3, h4, h5{
+  font-family: 'Black Han Sans', sans-serif;
+}
+.font1{
+  font-family: 'Gamja Flower', cursive;
+}
+.font2{
+  font-family: 'Black Han Sans', sans-serif;
+}
+.normal-font{
+  font-family: 'Noto Sans KR', sans-serif;
+}
+span, li, p{
+  font-family: 'Noto Sans KR', sans-serif;
+
 }

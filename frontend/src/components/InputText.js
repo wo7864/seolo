@@ -1,35 +1,37 @@
 import React from 'react';
+import '../css/InputText.css';
 
 
-export default class ShowImage extends React.Component {
+export default class InputText extends React.Component {
+    constructor(props){
+        super(props);
+    }
+
     render(){
-        let filename = this.props.filename
-
-        const img_dir = 'file:///C:/Users/wo786/api/static/image/'+filename;
-        const image = (
-            <a href={img_dir}>
-                <img src={img_dir}/>
-            </a>
-        )
         return(
-            <div>
-                <h1>서로 - 서예 로봇</h1>
-                <span>폰트종류: </span>
-                <select onChange={this.props.fontChange}>
-                    <option value="0">날린 글씨</option>
-                    <option value="1">구수한 글씨</option>
-                    <option value="2">동그란 글씨</option>
-                </select>
-                <br/>
+            <header className="masthead d-flex">
+                <div className="container text-center my-auto">
+                <h1 className="mb-1">서로</h1>
+                <h3 className="mb-5">
+                    인공지능 캘리그라퍼
+                </h3>
+                <div className="btn-list">
+                    <button onClick={this.props.handleChange} name="font" value="0" className={"btn btn-primary font-btn font1 " + (this.props.font==0 ? 'isSelected' : '')}>동글</button>
+                    <button onClick={this.props.handleChange} name="font" value="1" className={"btn btn-primary font-btn font1 " + (this.props.font==1 ? 'isSelected' : '')}>투박</button>
+                    <button onClick={this.props.handleChange} name="font" value="2" className={"btn btn-primary font-btn font1 " + (this.props.font==2 ? 'isSelected' : '')}>얇은</button>
+                </div>
                 <input
                     placeholder="한글을 입력해주세요."
                     name="input_text"
                     value={this.props.input_text}
                     onChange={this.props.handleChange}
+                    className="input-textbox"
                     />
-                <button onClick={this.props.create_image}>생성</button>
-                <br/>
-            </div>
+                <a className="btn btn-primary btn-xl js-scroll-trigger font1"
+                onClick={this.props.create_image}  href="#about">Let's Create!</a>
+                </div>
+                <div className="overlay"></div>
+            </header>
         )
     }
 }

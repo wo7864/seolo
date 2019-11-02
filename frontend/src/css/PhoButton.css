@@ -1,0 +1,446 @@
+.pho-btn{
+    background-color:white;
+    position: absolute;
+    border:0px;
+    font-family: 'Noto Sans KR', sans-serif;
+
+}
+.pho-btn:hover{
+    background-color:rgba(185,237,248,0.7);
+    border:0px;
+    z-index:10;
+}
+
+.pho-btn:focus{
+    background-color:rgba(185,237,248,1);
+
+    border:0px;
+    z-index:10;
+    outline: 0;
+}
+.shape0.phoneme0{
+    top:25px;
+    left:15px;
+}
+.shape0.phoneme2{
+    top:25px;
+    left:35px;
+}
+
+.shape1.phoneme0{
+    top:15px;
+    left:15px;
+}
+.shape1.phoneme2{
+    top:15px;
+    left:35px;
+}
+.shape1.phoneme4{
+    top:35px;
+    left:30px;
+}
+
+
+.shape2.phoneme0{
+    top:15px;
+    left:15px;
+}
+.shape2.phoneme2{
+    top:15px;
+    left:35px;
+}
+.shape2.phoneme4{
+    top:35px;
+    left:15px;
+}
+.shape2.phoneme5{
+    top:35px;
+    left:35px;
+}
+
+
+.shape3.phoneme0{
+    top:15px;
+    left:25px;
+}
+.shape3.phoneme2{
+    top:35px;
+    left:25px;
+}
+
+.shape4.phoneme0{
+    top:5px;
+    left:25px;
+}
+.shape4.phoneme2{
+    top:25px;
+    left:25px;
+}
+.shape4.phoneme4{
+    top:45px;
+    left:25px;
+}
+
+
+.shape5.phoneme0{
+    top:5px;
+    left:25px;
+}
+.shape5.phoneme2{
+    top:25px;
+    left:25px;
+}
+.shape5.phoneme4{
+    top:45px;
+    left:15px;
+}
+.shape5.phoneme5{
+    top:45px;
+    left:35px;
+}
+
+.shape6.phoneme0{
+    top:15px;
+    left:15px;
+}
+.shape6.phoneme3{
+    top:20px;
+    left:40px;
+}
+.shape6.phoneme2{
+    top:35px;
+    left:15px;
+}
+
+.shape7.phoneme0{
+    top:5px;
+    left:15px;
+}
+.shape7.phoneme3{
+    top:15px;
+    left:40px;
+}
+.shape7.phoneme2{
+    top:25px;
+    left:15px;
+}
+.shape7.phoneme4{
+    top:45px;
+    left:25px;
+}
+
+.shape8.phoneme0{
+    top:5px;
+    left:15px;
+}
+.shape8.phoneme3{
+    top:15px;
+    left:40px;
+}
+.shape8.phoneme2{
+    top:25px;
+    left:15px;
+}
+.shape8.phoneme4{
+    top:45px;
+    left:15px;
+}
+.shape8.phoneme5{
+    top:45px;
+    left:35px;
+}
+
+
+
+.shape9.phoneme0{
+    top:25px;
+    left:5px;
+}
+.shape9.phoneme2{
+    top:25px;
+    left:25px;
+}
+.shape9.phoneme3{
+    top:25px;
+    left:45px;
+}
+
+.shape10.phoneme0{
+    top:15px;
+    left:5px;
+}
+.shape10.phoneme2{
+    top:15px;
+    left:25px;
+}
+.shape10.phoneme3{
+    top:15px;
+    left:45px;
+}
+.shape10.phoneme4{
+    top:35px;
+    left:30px;
+}
+
+
+.shape11.phoneme0{
+    top:15px;
+    left:5px;
+}
+.shape11.phoneme2{
+    top:15px;
+    left:25px;
+}
+.shape11.phoneme3{
+    top:15px;
+    left:45px;
+}
+.shape11.phoneme4{
+    top:35px;
+    left:15px;
+}
+.shape11.phoneme5{
+    top:35px;
+    left:35px;
+}
+
+
+.shape12.phoneme0{
+    top:25px;
+    left:5px;
+}
+.shape12.phoneme1{
+    top:25px;
+    left:25px;
+}
+.shape12.phoneme2{
+    top:25px;
+    left:45px;
+}
+
+.shape13.phoneme0{
+    top:15px;
+    left:5px;
+}
+.shape13.phoneme1{
+    top:15px;
+    left:25px;
+}
+.shape13.phoneme2{
+    top:15px;
+    left:45px;
+}
+.shape13.phoneme4{
+    top:35px;
+    left:30px;
+}
+
+
+.shape14.phoneme0{
+    top:15px;
+    left:5px;
+}
+.shape14.phoneme1{
+    top:15px;
+    left:25px;
+}
+.shape14.phoneme2{
+    top:15px;
+    left:45px;
+}
+.shape14.phoneme4{
+    top:35px;
+    left:15px;
+}
+.shape14.phoneme5{
+    top:35px;
+    left:35px;
+}
+
+
+.shape15.phoneme0{
+    top:15px;
+    left:15px;
+}
+.shape15.phoneme1{
+    top:15px;
+    left:35px;
+}
+.shape15.phoneme2{
+    top:35px;
+    left:25px;
+}
+
+.shape16.phoneme0{
+    top:5px;
+    left:15px;
+}
+.shape16.phoneme1{
+    top:5px;
+    left:35px;
+}
+.shape16.phoneme2{
+    top:25px;
+    left:25px;
+}
+.shape16.phoneme4{
+    top:45px;
+    left:25px;
+}
+
+
+.shape17.phoneme0{
+    top:5px;
+    left:15px;
+}
+.shape17.phoneme1{
+    top:5px;
+    left:35px;
+}
+.shape17.phoneme2{
+    top:25px;
+    left:25px;
+}
+.shape17.phoneme4{
+    top:45px;
+    left:15px;
+}
+.shape17.phoneme5{
+    top:45px;
+    left:35px;
+}
+
+.shape18.phoneme0{
+    top:15px;
+    left:1px;
+}
+.shape18.phoneme1{
+    top:15px;
+    left:21px;
+}
+.shape18.phoneme3{
+    top:20px;
+    left:40px;
+}
+.shape18.phoneme2{
+    top:35px;
+    left:15px;
+}
+
+.shape19.phoneme0{
+    top:5px;
+    left:1px;
+}
+.shape19.phoneme1{
+    top:5px;
+    left:21px;
+}
+.shape19.phoneme3{
+    top:15px;
+    left:40px;
+}
+.shape19.phoneme2{
+    top:25px;
+    left:15px;
+}
+.shape19.phoneme4{
+    top:45px;
+    left:25px;
+}
+
+.shape20.phoneme0{
+    top:5px;
+    left:1px;
+}
+.shape20.phoneme1{
+    top:5px;
+    left:21px;
+}
+.shape20.phoneme3{
+    top:15px;
+    left:40px;
+}
+.shape20.phoneme2{
+    top:25px;
+    left:15px;
+}
+.shape20.phoneme4{
+    top:45px;
+    left:15px;
+}
+.shape20.phoneme5{
+    top:45px;
+    left:35px;
+}
+
+
+.shape21, .shape22, .shape23{
+    font-size:12px;
+}
+
+.shape21.phoneme0{
+    top:25px;
+    left:1px;
+}
+.shape21.phoneme1{
+    top:25px;
+    left:20px;
+}
+.shape21.phoneme2{
+    top:25px;
+    left:38px;
+}
+.shape21.phoneme3{
+    top:25px;
+    left:55px;
+}
+
+.shape22.phoneme0{
+    top:15px;
+    left:1px;
+}
+.shape22.phoneme1{
+    top:15px;
+    left:20px;
+}
+.shape22.phoneme2{
+    top:15px;
+    left:38px;
+}
+.shape22.phoneme3{
+    top:15px;
+    left:55px;
+}
+.shape22.phoneme4{
+    top:35px;
+    left:30px;
+}
+
+
+.shape23.phoneme0{
+    top:15px;
+    left:1px;
+}
+
+.shape23.phoneme1{
+    top:15px;
+    left:21px;
+}
+.shape23.phoneme2{
+    top:15px;
+    left:38px;
+}
+.shape23.phoneme3{
+    top:15px;
+    left:55px;
+}
+.shape23.phoneme4{
+    top:35px;
+    left:15px;
+}
+.shape23.phoneme5{
+    top:35px;
+    left:35px;
+}
+
+

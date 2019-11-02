@@ -1,50 +1,74 @@
 import React from 'react';
 
-export default class Option extends React.Component {
+export default class PhonemeOption extends React.Component {
+    constructor(props){
+        super(props);
+    }
     render(){
         const div_style={
-            float:"left",
+            display:"inline-block",
             marginLeft:"20px"
         }
-        const btn_style={
-            width:"40px",
-            height:"40px"
+        const div_style2={
+            display:"inline-block",
+            border:"1px solid black",
+            borderRadius:"5px",
+            padding:"10px",
+            backgroundColor:"white",
         }
-        const move_div={
-            marginLeft:"60px"
+        const custom_textbox={
+            width:"50px",
+            height:"30px",
+            border:"1px solid #aaa",
+            borderRadius:"5px",
+            marginBottom:"3px",
+            padding:"5px"
         }
-        const ten_space = <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+
         return(
-            <div>
+            <div class="text-center my-auto" >
+                <div style={div_style2}>
                 <div style={div_style}>
-                    <h3>{this.props.phoneme}</h3>
+                    <h3>{this.props.phoneme2}</h3>
                     <span>p1</span>
-                    <input type="range" name="p1" value={this.props.latter_list[this.props.latter][this.props.phoneme].params[0]} 
-                        onChange={this.props.change_value} onMouseUp={this.props.update_image}/><br/>
+                    <input type="range" name="p1" class="custom-range" 
+                        value={this.props.latter_list[this.props.latter][this.props.phoneme].params[0]} 
+                        onChange={this.props.change_value} onMouseUp={this.props.update_phoneme_shape}/><br/>
                     <span>p2</span>
-                    <input type="range" name="p2" value={this.props.latter_list[this.props.latter][this.props.phoneme].params[1]} 
-                        onChange={this.props.change_value} onMouseUp={this.props.update_image}/><br/>
+                    <input type="range" name="p2" class="custom-range" 
+                        value={this.props.latter_list[this.props.latter][this.props.phoneme].params[1]} 
+                        onChange={this.props.change_value} onMouseUp={this.props.update_phoneme_shape}/><br/>
                     <span>p3</span>
-                    <input type="range" name="p3" value={this.props.latter_list[this.props.latter][this.props.phoneme].params[2]} 
-                        onChange={this.props.change_value} onMouseUp={this.props.update_image}/><br/>
+                    <input type="range" name="p3" class="custom-range" 
+                        value={this.props.latter_list[this.props.latter][this.props.phoneme].params[2]} 
+                        onChange={this.props.change_value} onMouseUp={this.props.update_phoneme_shape}/><br/>
                     <span>p4</span>
-                    <input type="range" name="p4" value={this.props.latter_list[this.props.latter][this.props.phoneme].params[3]} 
-                        onChange={this.props.change_value} onMouseUp={this.props.update_image}/><br/>
+                    <input type="range" name="p4" class="custom-range" 
+                        value={this.props.latter_list[this.props.latter][this.props.phoneme].params[3]} 
+                        onChange={this.props.change_value} onMouseUp={this.props.update_phoneme_shape}/><br/>
                 </div>
                 <div style={div_style}>
-                    <span>x</span>
-                    <input name="x" value={this.props.latter_list[this.props.latter][this.props.phoneme].x} 
-                        onChange={this.props.change_value}/><br/>
-                    <span>y</span>
-                    <input name="y" value={this.props.latter_list[this.props.latter][this.props.phoneme].y} 
-                        onChange={this.props.change_value}/><br/>
-                    <br/>
-                    <span>width &nbsp;&nbsp;</span>
-                    <input type="range" name="width" value={this.props.latter_list[this.props.latter][this.props.phoneme].width} 
-                        onChange={this.props.change_value} onMouseUp={this.props.update_image}/><br/>
-                    <span>height </span>
-                    <input type="range" name="height" value={this.props.latter_list[this.props.latter][this.props.phoneme].height} 
-                        onChange={this.props.change_value} onMouseUp={this.props.update_image}/><br/>
+                    <span>X </span>
+                    <input name="x" style={custom_textbox}
+                        value={this.props.latter_list[this.props.latter][this.props.phoneme].x} 
+                        onChange={this.props.change_value} onBlur={this.props.update_phoneme_location}/>&nbsp;
+                    <span>Y </span>
+                    <input name="y" style={custom_textbox}
+                        value={this.props.latter_list[this.props.latter][this.props.phoneme].y} 
+                        onChange={this.props.change_value} onBlur={this.props.update_phoneme_location}/><br/>
+                    <span>rotation</span><br/>
+                    <input type="range" name="rotation" class="custom-range" min="-90" max="90" step="1"
+                        value={this.props.latter_list[this.props.latter][this.props.phoneme].rotation} 
+                        onChange={this.props.change_value} onMouseUp={this.props.update_phoneme_rotation}/><br/>
+                    <span>width</span><br/>
+                    <input type="range" name="width" class="custom-range" 
+                        value={this.props.latter_list[this.props.latter][this.props.phoneme].width} 
+                        onChange={this.props.change_value} onMouseUp={this.props.update_phoneme_size}/><br/>
+                    <span>height </span><br/>
+                    <input type="range" name="height" class="custom-range" 
+                        value={this.props.latter_list[this.props.latter][this.props.phoneme].height} 
+                        onChange={this.props.change_value} onMouseUp={this.props.update_phoneme_size}/><br/>
+                </div>
                 </div>
             </div>
         )

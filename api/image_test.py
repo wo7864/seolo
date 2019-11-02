@@ -4,55 +4,111 @@ import infogan
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import cv2
+from PIL import Image
 
-def remove_noise(img):
-    print(img)
+
+def blur(img, limit=0.5):
     width = img.shape[1]
     height = img.shape[0]
-    val = 4
-    for x in range(width-val):
-        for y in range(height-val):
-            swi = 0
-            for i in range(val):
-                if img[y][x+i] <= 1.0:
-                        swi = 1
-                if img[y+val][x+i] <= 1.0:
-                        swi = 1
-                if img[y+i][x] <= 1.0:
-                        swi = 1
-                if img[y+i][x+val] <= 1.0:
-                        swi = 1
-            if swi == 0:
-                img[y+1:y+val][x+1:x+val] = 1
-    return img
-
-def blur(img):
-    width = img.shape[1]
-    height = img.shape[0]
-    tmp = np.full((1, 28), 1)
-    tmp2 = np.full((30, 1), 1)
+    tmp = np.full((1, width), 1)
+    tmp2 = np.full((height+2, 1), 1)
     img = np.vstack([img, tmp])
     img = np.vstack([tmp, img])
     img = np.hstack([img, tmp2])
     img = np.hstack([tmp2, img])
     update_list = []
-    for x in range(1, width-1):
-        for y in range(1, height-1):
-            value = img[y-1][x-1] + img[y][x-1] + img[y+1][x-1] \
-            + img[y-1][x] + img[y+1][x] + img[y-1][x+1] + img[y][x+1] + img[y+1][x+1]
+    for x in range(1, width+1):
+        for y in range(1, height+1):
+            value = img[y-1][x-1] + img[y][x-1] + img[y+1][x-1] + img[y-1][x] + img[y+1][x] + img[y-1][x+1] + \
+                    img[y][x+1] + img[y+1][x+1]
             value /= 8
-            if img[y][x] + 0.5 <value:
+            if limit < value:
                 update_list.append((x, y, value))
     for i in update_list:
-        img[i[1]][i[0]] = i[2]
+        img[i[1]][i[0]] = limit+0.1
     return img
+
+
+def remove_noise(img, size=4):
+    width = img.shape[1]
+    height = img.shape[0]
+    degree = 0.6
+    for x in range(width-size):
+        for y in range(height-size):
+            swi = 0
+            for i in range(size+1):
+                if not (img[y][x+i] > degree and img[y+size][x+i] > degree and img[y+i][x] > degree and img[y+i][x+size] > degree):
+                    swi = 1
+            if swi == 0:
+                img[y+1:y+size][x+1:x+size] = 1
+    return img
+
+
+def set_color(result, color):
+    r = np.full([result.shape[0], result.shape[1]], color[0])
+    g = np.full([result.shape[0], result.shape[1]], color[1])
+    b = np.full([result.shape[0], result.shape[1]], color[2])
+    r = r[:] / 1
+    g = g[:] / 1
+    b = b[:] / 1
+    result = 1 - result[:]
+    result = result[:] * 255
+    img2 = []
+    for i in range(result.shape[0]):
+        tmp = []
+        for j in range(result.shape[1]):
+            tmp.append([r[i][j], g[i][j], b[i][j], result[i][j]])
+        img2.append(tmp)
+    img2 = np.array(img2)
+    result = img2.astype(np.uint8)
+    result = Image.fromarray(result, 'RGBA')
+    return result
+
+def set_color_rgb(result):
+    result = result[:] * 255
+    img2 = []
+    for i in range(result.shape[0]):
+        tmp = []
+        for j in range(result.shape[1]):
+            tmp.append([result[i][j], result[i][j], result[i][j]])
+        img2.append(tmp)
+    img2 = np.array(img2)
+    result = img2.astype(np.uint8)
+    result = Image.fromarray(result, 'RGB')
+    return result
+
+def normalization(result):
+    min_value = np.min(result)
+    result = result[:] - min_value
+    max_value = np.max(result)
+    result = result[:] / max_value
+    return result
+
+
+def set_definition(result, definition=100):
+    definition = definition / 200
+    # definition: 0~1
+    for idx, i in enumerate(result):
+        for idx2, j in enumerate(i):
+            if j > 1-definition:
+                result[idx][idx2] = 1
+            elif j <= definition:
+                result[idx][idx2] = 0
+    return result
+
+
+def update_rotation(img2, rotation):
+    matrix = cv2.getRotationMatrix2D((img2.shape[1]/2, img2.shape[0]/2), rotation, 1)
+    img2 = cv2.warpAffine(img2, matrix, (img2.shape[1], img2.shape[0]),  borderMode=cv2.BORDER_REPLICATE)
+    return img2
+
 
 sess = tf.compat.v1.Session()
 model = infogan.GAN(sess)
-save_dir = "./infogan_model/type1/"
-filename = "type1_1.ckpt"
+save_dir = "./infogan_model/type5/"
+filename = "type5_8.ckpt"
 model.saver.restore(sess, save_dir+filename)
-noise = np.full((1, 62), 0)
+noise = np.full((1, 62), 0.5)
 noise = np.tile(noise, [1, 1])
 latent_code = np.zeros([1, 4])
 
@@ -61,17 +117,12 @@ generated = sess.run(model.Gen, {
         })
 img = np.reshape(generated, (model.height, model.width))  # 이미지 형태로. #num_generate, height, width
 
-#img = blur(img)
-#img = remove_noise(img)
+img = normalization(img)
+img = blur(img)
+img = set_definition(img)
 
-fig = plt.figure(figsize=(1, 1))
-gs = gridspec.GridSpec(1, 1)
-gs.update(wspace=0.05, hspace=0.05)
-ax = plt.subplot(gs[0])
-plt.axis('off')
-ax.set_xticklabels([])
-ax.set_yticklabels([])
-ax.set_aspect('equal')
-plt.imshow(img, cmap='Greys_r')
-plt.show()
-plt.close(fig)
+img = cv2.resize(img, (200, 200), interpolation=cv2.INTER_LINEAR)
+img = update_rotation(img)
+img = set_color_rgb(img)
+
+img.save("test.png")

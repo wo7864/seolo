@@ -1,0 +1,28 @@
+.background-style{
+    min-height: 30rem;
+    position: relative;
+    display: table;
+    width: 100%;
+    height: 100%;
+    padding-top: 3rem;
+    padding-bottom: 8rem;
+    /*background: rgba(185,237,248,0.3);*/
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.loading-div{
+    position: fixed;
+    background-color:rgba(0,0,0,0.5);
+    top:0px;
+    left:0px;
+    width:100%;
+    height:100%;
+    z-index:999;
+}
+.spinner{
+    position: absolute;
+    left:50%;
+    top:50%;
+}
