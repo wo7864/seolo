@@ -242,7 +242,7 @@ class ImageOption(Resource):
         text = text.replace("'", "\"")
         text = json.loads(text)
         latter_list = main.json_to_obj(text)
-        filename, image_width, image_height = main.img_attach(latter_list, definition, color, is_invisiable, input_text, bg_data, image_width, image_height)
+        filename, cb_filename, image_width, image_height = main.img_attach(latter_list, definition, color, is_invisiable, input_text, bg_data, image_width, image_height)
         com = 's3cmd put ./static/image/{} s3://seolo/static/image/'.format(filename)
         os.system(com)
         res = {
