@@ -10,7 +10,7 @@ import {Spinner} from 'react-bootstrap'
 import '../css/Main.css';
 //const domain = "http://15.164.227.195:5000/calligraphy";
 
-const domain ="http://127.0.0.1:5000/calligraphy";
+const domain ="http://15.165.15.223:5000/calligraphy";
 
 export default class Main extends React.Component {
     constructor(props){
