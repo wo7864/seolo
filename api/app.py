@@ -33,6 +33,8 @@ parser.add_argument('color')
 parser.add_argument('file', type=werkzeug.datastructures.FileStorage, location='files')
 parser.add_argument('filename')
 parser.add_argument('bg_filename')
+parser.add_argument('x_in_bg')
+parser.add_argument('y_in_bg')
 phoneme_list = ['ㄱ', 'ㄴ', 'ㄷ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅅ', 'ㅇ', 'ㅈ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ', 'ㅏ', 'ㅑ', 'ㅔ', 'ㅐ'
     , 'ㅓ', 'ㅕ', 'ㅣ', 'ㅗ', 'ㅛ', 'ㅜ', 'ㅠ', 'ㅡ', ' ', '\n']
 
@@ -90,10 +92,12 @@ class PhonemeShapeOption(Resource):
         text = text.replace("'", "\"")
         text = json.loads(text)
         latter_list = main.json_to_obj(text)
-        model_num = phoneme_list.index(latter_list[latter_num][phoneme_num].phoneme)
-        target_img = main.create_one_image(latter_list[latter_num][phoneme_num], model_list[font][model_num],
-                                           sess_list[font][model_num])
-        latter_list[latter_num][phoneme_num].img = target_img
+        target = latter_list[latter_num][phoneme_num]
+        model_num = phoneme_list.index(target.phoneme)
+        target_img = main.create_one_image(target, model_list[font][model_num],  sess_list[font][model_num])
+        target_img = cv2.resize(target_img, (int(target.width), int(target.height)), interpolation=cv2.INTER_LINEAR)
+        target_img = main.update_rotation(target_img, target.rotation)
+        target.img = target_img
         filename, cb_filename, image_width, image_height = main.img_attach(latter_list, definition, color, is_invisiable, input_text, bg_data, image_width, image_height)
 
         text[latter_num][phoneme_num]['img'] = target_img.tolist()
@@ -202,6 +206,7 @@ class PhonemeRotationOption(Resource):
         target = latter_list[latter_num][phoneme_num]
         model_num = phoneme_list.index(target.phoneme)
         target_img = main.create_one_image(target, model_list[font][model_num], sess_list[font][model_num])
+        target_img = cv2.resize(target_img, (int(target.width), int(target.height)), interpolation=cv2.INTER_LINEAR)
         target_img = main.update_rotation(target_img, target.rotation)
         target.img = target_img
         filename, cb_filename, image_width, image_height = main.img_attach(latter_list, definition, color, is_invisiable, input_text, bg_data, image_width, image_height)
