@@ -345,4 +345,4 @@ api.add_resource(AddBackGroundImage, '/calligraphy/background')
 api.add_resource(SampleImage, '/calligraphy/sample')
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    app.run(host='0.0.0.0')

@@ -562,20 +562,29 @@ def gen_image(text, model, sess, param_list):
 
 
 def create_sample_image(font, text, model, sess, param_list):
+    file_list = []
     for i in range(4):
         for j in range(0, 101, 100):
             tmp = param_list[i]
             param_list[i] = j
-            img = gen_image(text, model, sess, param_list)
-            img = img[:] * 255
-            img = img.astype(np.uint8)
-            img = Image.fromarray(img, 'L')
             filename = '{}_{}_{}_{}_{}_{}.png'.format(font, text, param_list[0], param_list[1], param_list[2], param_list[3])
             save_dir = 'static/image/sample/'
-            img.save(save_dir + filename)
-            com = 's3cmd put ./static/image/sample/{} s3://seolo/static/image/sample/'.format(filename)
-            os.system(com)
+            f = save_dir + filename
+            if not os.path.isfile(f):
+                img = gen_image(text, model, sess, param_list)
+                img = img[:] * 255
+                img = img.astype(np.uint8)
+                img = Image.fromarray(img, 'L')
+                img.save(f)
+                file_list.append(f)
             param_list[i] = tmp
+    com = 's3cmd put '
+    for f in file_list:
+        com += f
+        com += ' '
+    com += 's3://seolo/static/image/sample/'
+    print(com)
+    os.system(com)
     return 0
 
 

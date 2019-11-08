@@ -9,7 +9,7 @@ import InputText from './InputText';
 import {Spinner} from 'react-bootstrap'
 import '../css/Main.css';
 
-const domain ="http://127.0.0.1:5000/calligraphy";
+const domain ="http://52.78.32.67:5000/calligraphy";
 
 export default class Main extends React.Component {
     constructor(props){
@@ -35,7 +35,8 @@ export default class Main extends React.Component {
             is_loading:false,
             x_in_bg:0,
             y_in_bg:0,
-            real_time:true
+            real_time:true,
+            sample:[]
         };
         this.create_image = this.create_image.bind(this);
         this.handleChange = this.handleChange.bind(this);
@@ -52,6 +53,7 @@ export default class Main extends React.Component {
         this.handleImage = this.handleImage.bind(this);
         this.checkboxChange = this.checkboxChange.bind(this);
         this.toggle_real_time = this.toggle_real_time.bind(this);
+        this.get_sample = this.get_sample.bind(this);
     }
 
     create_image(){
@@ -83,15 +85,7 @@ export default class Main extends React.Component {
                 console.log(response);
             });
     }
-
-    select_phoneme(latter_num, phoneme_num, phoneme){
-
-        this.setState({
-            is_loading:true,
-            selected_latter:latter_num,
-            selected_phoneme:phoneme_num,
-            selected_phoneme2:phoneme
-        })
+    get_sample(latter_num, phoneme_num, phoneme){
         axios.post(domain+'/sample', {
             latter_list:[this.state.latter_list],
             font:this.state.font,
@@ -99,8 +93,27 @@ export default class Main extends React.Component {
             phoneme_num: phoneme_num,
         })
             .then( response => {
+                const phoneme_list = ['ㄱ', 'ㄴ', 'ㄷ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅅ', 'ㅇ', 'ㅈ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ', 'ㅏ', 'ㅑ', 'ㅔ', 'ㅐ', 'ㅓ', 'ㅕ', 'ㅣ', 'ㅗ', 'ㅛ', 'ㅜ', 'ㅠ', 'ㅡ', ' ', '\n']
+
+                let params = this.state.latter_list[latter_num][phoneme_num].params;
+                let sample = [];
+                let phoneme_num2 = 0;
+                let tmp = 0;
+                let filename = '';
+                const s3_path = 'http://seolo.s3-website.ap-northeast-2.amazonaws.com/static/image/sample/';
+                for(let i=0;i<4;i++){
+                    for(let j=0;j<101;j+=100){
+                        phoneme_num2 = phoneme_list.indexOf(phoneme);
+                        tmp = params[i];
+                        params[i] = j;
+                        filename = this.state.font + "_" + phoneme_num2 + "_" + params[0] + "_" + params[1] + "_" + params[2] + "_" + params[3] + ".png";
+                        sample.push(s3_path + filename);
+                        params[i] = tmp;
+                    }
+                }
                 this.setState({
-                    is_loading:false
+                    is_loading:false,
+                    sample:sample
                 })
             })
             .catch( response => {
@@ -109,7 +122,16 @@ export default class Main extends React.Component {
                 })
                 console.log(response);
             });
+    }
+    select_phoneme(latter_num, phoneme_num, phoneme){
 
+        this.setState({
+            is_loading:true,
+            selected_latter:latter_num,
+            selected_phoneme:phoneme_num,
+            selected_phoneme2:phoneme
+        })
+        this.get_sample(latter_num, phoneme_num, phoneme);
     }
 
     change_value(e){
@@ -204,6 +226,7 @@ export default class Main extends React.Component {
         })
     }
 
+   
     update_phoneme(){
         if(this.state.real_time)
             return;
@@ -269,8 +292,8 @@ export default class Main extends React.Component {
                     filename:response.data.filename,
                     cb_filename:response.data.cb_filename,
                     latter_list:response.data.latter_list,
-                    is_loading:false
                 })
+                this.get_sample(this.state.selected_latter, this.state.selected_phoneme, this.state.selected_phoneme2);
             })
             .catch( response => {
                 this.setState({
@@ -449,7 +472,6 @@ export default class Main extends React.Component {
     }
 
     render(){
-        console.log(this.state.blur);
         const div_style={
             float:"left",
             marginLeft:"20px"
@@ -508,7 +530,6 @@ export default class Main extends React.Component {
                     latter_list={this.state.latter_list}
                     input_text={this.state.input_text}
                     select_phoneme={this.select_phoneme}
-                    get_sample={this.get_sample}
                 />
                 {this.state.selected_phoneme != -1 && 
                 <PhonemeOption 
@@ -528,6 +549,7 @@ export default class Main extends React.Component {
                     change_value={this.change_value}
                     style={div_style}
                     real_time={this.state.real_time}
+                    sample={this.state.sample}
                     />
 
                 }
