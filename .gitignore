@@ -28,8 +28,6 @@ yarn-error.log*
 # api
 api/infogan_model/
 api/static/image/
-api/static/test_img/
-api/static/test_src/
 
 api/env/
-api/npy/
+
