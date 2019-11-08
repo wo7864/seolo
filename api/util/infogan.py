@@ -10,10 +10,10 @@ class GAN:
         self.train_rate_D_Q = 0.0002
         self.train_rate_G = 0.001
         self.channel = 1  # mnist는 흑백
-        self.height = 64  # mnist 28*28인데 resize 해줘서 64*64임.
-        self.width = 64
-        self.noise_dim = 50  # 노이즈 차원 #infogan paper
-        self.continuous = 3
+        self.height = 28  # mnist 28*28인데 resize 해줘서 64*64임.
+        self.width = 28
+        self.noise_dim = 62  # 노이즈 차원 #infogan paper
+        self.continuous = 4
 
         with tf.name_scope("placeholder"):
             # class 밖에서 모델 실행시킬때 학습데이터 넣어주는곳.
@@ -149,10 +149,10 @@ class GAN:
             G_fc1 = tf.layers.batch_normalization(G_fc1, training=self.is_train, name='G_fc1_bn')
             G_fc1 = tf.nn.relu(G_fc1)
 
-            G_fc2 = tf.layers.dense(G_fc1, 16 * 16 * 128, activation=None, name='G_fc2')
+            G_fc2 = tf.layers.dense(G_fc1, 7 * 7 * 128, activation=None, name='G_fc2')
             G_fc2 = tf.layers.batch_normalization(G_fc2, training=self.is_train, name='G_fc2_bn')
             G_fc2 = tf.nn.relu(G_fc2)
-            G_fc2 = tf.reshape(G_fc2, [-1, 16, 16, 128])
+            G_fc2 = tf.reshape(G_fc2, [-1, 7, 7, 128])
 
             G_upconv1 = tf.layers.conv2d_transpose(inputs=G_fc2, filters=64, kernel_size=[4, 4], strides=(2, 2),
                                                    padding='same')  # batch, 14, 14, 64

@@ -1,10 +1,9 @@
 import tensorflow as tf
 import numpy as np
-import infogan
-import matplotlib.pyplot as plt
-import matplotlib.gridspec as gridspec
+import infogan as infogan
 import cv2
 from PIL import Image
+from keras.models import model_from_json
 
 
 def blur(img, limit=0.5):
@@ -85,7 +84,7 @@ def normalization(result):
     return result
 
 
-def set_definition(result, definition=100):
+def set_definition(result, definition=90):
     definition = definition / 200
     # definition: 0~1
     for idx, i in enumerate(result):
@@ -105,12 +104,12 @@ def update_rotation(img2, rotation):
 
 sess = tf.compat.v1.Session()
 model = infogan.GAN(sess)
-save_dir = "./infogan_model/type5/"
-filename = "type5_8.ckpt"
+save_dir = "./infogan_model/type6/"
+filename = "type6_1.ckpt"
 model.saver.restore(sess, save_dir+filename)
-noise = np.full((1, 62), 0.5)
+noise = np.full((1, 50), 0)
 noise = np.tile(noise, [1, 1])
-latent_code = np.zeros([1, 4])
+latent_code = np.full((1, 3), -1)
 
 generated = sess.run(model.Gen, {
             model.noise_source: noise, model.latent_code: latent_code, model.is_train: False
@@ -120,9 +119,12 @@ img = np.reshape(generated, (model.height, model.width))  # 이미지 형태로.
 img = normalization(img)
 img = blur(img)
 img = set_definition(img)
-
+#img = cv2.blur(img, (i*2+1, i*2+1), 0)
 img = cv2.resize(img, (200, 200), interpolation=cv2.INTER_LINEAR)
-img = update_rotation(img)
-img = set_color_rgb(img)
+img = img[:] * 255
+img = img.astype(np.uint8)
+img = Image.fromarray(img, 'L')
+#img = update_rotation(img, 0)
+#img = set_color_rgb(img)
 
-img.save("test.png")
+img.save("./test_img/test.png")

@@ -31,8 +31,17 @@ export default class PhonemeList extends React.Component {
                     <li class="sidebar-brand normal-font white">
                         이미지 옵션
                     </li>
-                    
-
+                    <li class="sidebar-nav-item">
+                        <span>blur</span>
+                        <input value={this.props.blur} 
+                            type="range"
+                            class="custom-range"
+                            onChange={this.props.handleChange}
+                            name="blur"
+                            min="0"
+                            max="5"
+                            step="1"/>
+                    </li>
                     <li class="sidebar-nav-item">
                         <span>R</span>
                         <input value={this.props.color[0]} 

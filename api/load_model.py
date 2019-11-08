@@ -4,7 +4,7 @@ import infogan
 def load():
     sess_list = []
     model_list = []
-    font_list = ['type5', 'type4']
+    font_list = ['type7']
     for font in font_list:
         sess_list2 = []
         model_list2 = []
@@ -22,3 +22,5 @@ def load():
         model_list.append(model_list2)
         sess_list.append(sess_list2)
     return model_list, sess_list
+
+

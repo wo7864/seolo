@@ -7,7 +7,6 @@ import os
 # 만든 모델 리스트
 phoneme_list = ['ㄱ', 'ㄴ', 'ㄷ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅅ', 'ㅇ', 'ㅈ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ', 'ㅏ', 'ㅑ', 'ㅔ', 'ㅐ'
     , 'ㅓ', 'ㅕ', 'ㅣ', 'ㅗ', 'ㅛ', 'ㅜ', 'ㅠ', 'ㅡ', ' ', '\n']
-
 '''
 shape 종류
 쌍자음이 아닌 초성
@@ -58,7 +57,7 @@ class Phoneme:
         self.rotation = rotation
 
     def set_location(self):
-        value = [x*16 for x in range(1, 10)]
+        value = [x*7 for x in range(1, 10)]
         if self.shape == 0:
             if self.phoneme_num == 0:
                 self.y += value[2]
@@ -319,7 +318,7 @@ def add_image(paper, image, width_point, height_point):
     return paper
 
 
-def set_definition(result, definition=90):
+def set_definition(result, definition=100):
     definition = definition / 200
     # definition: 0~1
     for idx, i in enumerate(result):
@@ -388,13 +387,28 @@ def create_latter_list(font, model_list, sess_list, text, shape_list, param_list
                 phoneme_list2.append('')
 
         if shape_list[idx] in small_list:
-            x_point += 64
+            x_point += 28
         else:
-            x_point += 128
+            x_point += 56
         latter_list.append(phoneme_list2)
         json_latter_list.append(json_pho_list)
     return latter_list, json_latter_list
 
+'''
+def set_color(result, color):
+    r = np.full([result.shape[0], result.shape[1]], color[0])
+    g = np.full([result.shape[0], result.shape[1]], color[1])
+    b = np.full([result.shape[0], result.shape[1]], color[2])
+    r = r[:] / 1
+    g = g[:] / 1
+    b = b[:] / 1
+    result = 1 - result[:]
+    result = result[:] * 255
+    result = cv2.merge((r, g, b, result))
+    result = result.astype(np.uint8)
+    result = Image.fromarray(result, 'RGBA')
+    return result
+'''
 
 def set_color_rgba(result, color):
     r = np.full([result.shape[0], result.shape[1]], color[0])
@@ -431,7 +445,7 @@ def set_color_rgb(result):
     return result
 
 
-def img_attach(latter_list, blur_value, color, is_invisiable, ori_text, bg_data, image_width=None, image_height=None):
+def img_attach(latter_list, definition, color, is_invisiable, ori_text, bg_data, image_width=None, image_height=None):
     left = 9999999999
     right = 0
     top = 999999999
@@ -478,11 +492,10 @@ def img_attach(latter_list, blur_value, color, is_invisiable, ori_text, bg_data,
                     result = add_image(result, pho.img, pho.x, pho.y)
 
     if not image_width:
-        image_width = result.shape[1] * 2
+        image_width = result.shape[1] * 5
     if not image_height:
-        image_height = result.shape[0] * 2
+        image_height = result.shape[0] * 5
 
-    result = cv2.blur(result, (blur_value * 2 + 1, blur_value * 2 + 1), 0)
     # 각 길이를 5배로 확장
     result = cv2.resize(result, (image_width, image_height), interpolation=cv2.INTER_LINEAR)
 
@@ -531,20 +544,34 @@ def blur(img, limit=0.5):
     return img
 
 
+def remove_noise(img, size=5):
+    width = img.shape[1]
+    height = img.shape[0]
+    degree = 0.4
+    for x in range(width-size):
+        for y in range(height-size):
+            swi = 0
+            for i in range(size+1):
+                if not (img[y][x+i] < degree and img[y+size][x+i] < degree and img[y+i][x] < degree and img[y+i][x+size] < degree):
+                    swi = 1
+            if swi == 0:
+                img[y+1:y+size][x+1:x+size] = 0
+    return img
+
+
 def gen_image(text, model, sess, param_list):
     if text < 26:
-        noise = np.full((1, 50), (int(param_list[3])/50) - 1)
+        noise = np.full((1, 62), 0)
         noise = np.tile(noise, [1, 1])
-        latent_code = np.zeros([1, 3])
-        for idx in range(3):
-            latent_code[:, idx] = (int(param_list[idx])/50) - 1
+        latent_code = np.zeros([1, 4])
+        for idx, param in enumerate(param_list):
+            latent_code[:, idx] = param
         generated = sess.run(model.Gen, {  # num_generate, 28, 28, 1
             model.noise_source: noise, model.latent_code: latent_code, model.is_train: False
         }
         )
-
         img = np.reshape(generated, (model.height, model.width))  # 이미지 형태로. #num_generate, height, width
-        img = normalization(img)
+
         width = int(img.shape[1] / 4)
         height = int(img.shape[0] / 4)
         tmp = np.full((width, width*4), 1)
@@ -554,29 +581,12 @@ def gen_image(text, model, sess, param_list):
         img = np.hstack([img, tmp2])
         img = np.hstack([tmp2, img])
 
+        img = normalization(img)
         img = blur(img)
         img = set_definition(img)
         return img
     else:
         return ''
-
-
-def create_sample_image(font, text, model, sess, param_list):
-    for i in range(4):
-        for j in range(0, 101, 100):
-            tmp = param_list[i]
-            param_list[i] = j
-            img = gen_image(text, model, sess, param_list)
-            img = img[:] * 255
-            img = img.astype(np.uint8)
-            img = Image.fromarray(img, 'L')
-            filename = '{}_{}_{}_{}_{}_{}.png'.format(font, text, param_list[0], param_list[1], param_list[2], param_list[3])
-            save_dir = 'static/image/sample/'
-            img.save(save_dir + filename)
-            com = 's3cmd put ./static/image/sample/{} s3://seolo/static/image/sample/'.format(filename)
-            os.system(com)
-            param_list[i] = tmp
-    return 0
 
 
 def update_rotation(img2, rotation):
@@ -587,21 +597,15 @@ def update_rotation(img2, rotation):
 
 
 def create_one_image(phoneme, model, sess):
-
-    noise = np.full((1, 50), phoneme.param_list[0])
-    params = phoneme.param_list[1:]
+    noise = np.full((1, 62), 0)
     noise = np.tile(noise, [1, 1])
-    latent_code = np.zeros([1, 3])
-    for idx, param in enumerate(params):
+    latent_code = np.zeros([1, 4])
+    for idx, param in enumerate(phoneme.param_list):
         latent_code[:, idx] = (int(param)/50) - 1
-
-    generated = sess.run(model.Gen, {
+    generated = sess.run(model.Gen, {  # num_generate, 28, 28, 1
         model.noise_source: noise, model.latent_code: latent_code, model.is_train: False
     })
     img = np.reshape(generated, (model.height, model.width))  # 이미지 형태로. #num_generate, height, width
-    print(img)
-    img = normalization(img)
-    print(img)
     width = int(img.shape[1] / 4)
     height = int(img.shape[0] / 4)
     tmp = np.full((width, width * 4), 1)
@@ -610,9 +614,9 @@ def create_one_image(phoneme, model, sess):
     img = np.vstack([tmp, img])
     img = np.hstack([img, tmp2])
     img = np.hstack([tmp2, img])
-
-    #img = blur(img)
-    #img = set_definition(img)
+    img = normalization(img)
+    img = blur(img)
+    img = set_definition(img)
     return img
 
 

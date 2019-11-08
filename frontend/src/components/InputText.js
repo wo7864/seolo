@@ -27,7 +27,7 @@ export default class InputText extends React.Component {
                     onChange={this.props.handleChange}
                     className="input-textbox"
                     />
-                <a className="btn btn-primary btn-xl js-scroll-trigger font1"
+                <a className="btn btn-primary btn-xl js-scroll-trigger font1 create-btn"
                 onClick={this.props.create_image}  href="#about">Let's Create!</a>
                 </div>
                 <div className="overlay"></div>

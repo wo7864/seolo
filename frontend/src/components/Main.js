@@ -8,9 +8,8 @@ import update from 'react-addons-update';
 import InputText from './InputText';
 import {Spinner} from 'react-bootstrap'
 import '../css/Main.css';
-//const domain = "http://15.164.227.195:5000/calligraphy";
 
-const domain ="http://15.165.15.223:5000/calligraphy";
+const domain ="http://127.0.0.1:5000/calligraphy";
 
 export default class Main extends React.Component {
     constructor(props){
@@ -25,7 +24,7 @@ export default class Main extends React.Component {
             selected_latter:-1,
             selected_phoneme:-1,
             selected_phoneme2:'',
-            definition:0,
+            blur:0,
             image_width:0,
             image_height:0,
             color:[1, 1, 1],
@@ -35,7 +34,8 @@ export default class Main extends React.Component {
             cb_filename:'',
             is_loading:false,
             x_in_bg:0,
-            y_in_bg:0
+            y_in_bg:0,
+            real_time:true
         };
         this.create_image = this.create_image.bind(this);
         this.handleChange = this.handleChange.bind(this);
@@ -43,6 +43,7 @@ export default class Main extends React.Component {
         this.change_value = this.change_value.bind(this);
         this.set_color = this.set_color.bind(this);
         this.update_image_option = this.update_image_option.bind(this);
+        this.update_phoneme = this.update_phoneme.bind(this);
         this.update_phoneme_location = this.update_phoneme_location.bind(this);
         this.update_phoneme_shape = this.update_phoneme_shape.bind(this);
         this.update_phoneme_size = this.update_phoneme_size.bind(this);
@@ -50,6 +51,7 @@ export default class Main extends React.Component {
         this.update_background_image = this.update_background_image.bind(this);
         this.handleImage = this.handleImage.bind(this);
         this.checkboxChange = this.checkboxChange.bind(this);
+        this.toggle_real_time = this.toggle_real_time.bind(this);
     }
 
     create_image(){
@@ -65,7 +67,7 @@ export default class Main extends React.Component {
                 this.setState({
                     filename:response.data.filename,
                     latter_list:response.data.latter_list,
-                    definition:response.data.definition,
+                    blur:response.data.blur,
                     color:response.data.color,
                     image_width:response.data.image_width,
                     image_height:response.data.image_height,
@@ -83,11 +85,31 @@ export default class Main extends React.Component {
     }
 
     select_phoneme(latter_num, phoneme_num, phoneme){
+
         this.setState({
+            is_loading:true,
             selected_latter:latter_num,
             selected_phoneme:phoneme_num,
             selected_phoneme2:phoneme
         })
+        axios.post(domain+'/sample', {
+            latter_list:[this.state.latter_list],
+            font:this.state.font,
+            latter_num: latter_num,
+            phoneme_num: phoneme_num,
+        })
+            .then( response => {
+                this.setState({
+                    is_loading:false
+                })
+            })
+            .catch( response => {
+                this.setState({
+                    is_loading:false                    
+                })
+                console.log(response);
+            });
+
     }
 
     change_value(e){
@@ -148,7 +170,7 @@ export default class Main extends React.Component {
         })
         axios.put(domain+'/image', {
             latter_list:[this.state.latter_list],
-            definition:this.state.definition,
+            blur:this.state.blur,
             image_width:this.state.image_width,
             image_height:this.state.image_height,
             color:[this.state.color],
@@ -173,7 +195,56 @@ export default class Main extends React.Component {
             });
     }
 
+
+    toggle_real_time(){
+
+        let target = !this.state.real_time;
+        this.setState({
+            real_time:target
+        })
+    }
+
+    update_phoneme(){
+        if(this.state.real_time)
+            return;
+        this.setState({
+            is_loading:true
+        })
+        
+        axios.put(domain, {
+            latter_list:[this.state.latter_list],
+            latter_num: this.state.selected_latter,
+            phoneme_num: this.state.selected_phoneme,
+            input_text: this.state.input_text,
+            font:this.state.font,
+            blur:this.state.blur,
+            image_width:this.state.image_width,
+            image_height:this.state.image_height,
+            is_invisiable:this.state.is_invisiable ? 1 : 0,
+            color:[this.state.color],
+            bg_filename:this.state.bg_filename,
+            x_in_bg:this.state.x_in_bg,
+            y_in_bg:this.state.y_in_bg
+        })
+            .then( response => {
+                this.setState({
+                    filename:response.data.filename,
+                    cb_filename:response.data.cb_filename,
+                    latter_list:response.data.latter_list,
+                    is_loading:false
+                })
+            })
+            .catch( response => {
+                this.setState({
+                    is_loading:false                    
+                })
+                console.log(response);
+            });    
+    }
+
     update_phoneme_shape(){
+        if(!this.state.real_time)
+            return;
         this.setState({
             is_loading:true
         })
@@ -184,7 +255,7 @@ export default class Main extends React.Component {
             phoneme_num: this.state.selected_phoneme,
             input_text: this.state.input_text,
             font:this.state.font,
-            definition:this.state.definition,
+            blur:this.state.blur,
             image_width:this.state.image_width,
             image_height:this.state.image_height,
             is_invisiable:this.state.is_invisiable ? 1 : 0,
@@ -210,13 +281,15 @@ export default class Main extends React.Component {
     }
 
     update_phoneme_location(){
+        if(!this.state.real_time)
+            return;
         this.setState({
             is_loading:true
         })
         axios.put(domain+'/location', {
             latter_list:[this.state.latter_list],
             input_text: this.state.input_text,
-            definition:this.state.definition,
+            blur:this.state.blur,
             image_width:this.state.image_width,
             image_height:this.state.image_height,
             is_invisiable:this.state.is_invisiable ? 1 : 0,
@@ -242,6 +315,8 @@ export default class Main extends React.Component {
     }
 
     update_phoneme_size(){
+        if(!this.state.real_time)
+            return;
         this.setState({
             is_loading:true
         })
@@ -250,7 +325,7 @@ export default class Main extends React.Component {
             latter_num: this.state.selected_latter,
             phoneme_num: this.state.selected_phoneme,
             input_text: this.state.input_text,
-            definition:this.state.definition,
+            blur:this.state.blur,
             image_width:this.state.image_width,
             image_height:this.state.image_height,
             is_invisiable:this.state.is_invisiable ? 1 : 0,
@@ -275,6 +350,8 @@ export default class Main extends React.Component {
     }
 
     update_phoneme_rotation(){
+        if(!this.state.real_time)
+            return;
         this.setState({
             is_loading:true
         })
@@ -284,7 +361,7 @@ export default class Main extends React.Component {
             latter_num: this.state.selected_latter,
             phoneme_num: this.state.selected_phoneme,
             input_text: this.state.input_text,
-            definition:this.state.definition,
+            blur:this.state.blur,
             image_width:this.state.image_width,
             image_height:this.state.image_height,
             is_invisiable:this.state.is_invisiable ? 1 : 0,
@@ -372,6 +449,7 @@ export default class Main extends React.Component {
     }
 
     render(){
+        console.log(this.state.blur);
         const div_style={
             float:"left",
             marginLeft:"20px"
@@ -404,7 +482,7 @@ export default class Main extends React.Component {
             html = 
             <div>
                 <ImageOption
-                    definition={this.state.definition}
+                    blur={this.state.blur}
                     image_width={this.state.image_width}
                     image_height={this.state.image_height}
                     handleChange={this.handleChange}
@@ -430,21 +508,26 @@ export default class Main extends React.Component {
                     latter_list={this.state.latter_list}
                     input_text={this.state.input_text}
                     select_phoneme={this.select_phoneme}
+                    get_sample={this.get_sample}
                 />
                 {this.state.selected_phoneme != -1 && 
                 <PhonemeOption 
+                    font={this.state.font}
                     phoneme2={this.state.selected_phoneme2}
                     phoneme={this.state.selected_phoneme}
                     latter={this.state.selected_latter}
                     latter_list={this.state.latter_list}
+                    update_phoneme={this.update_phoneme}
                     update_phoneme_shape={this.update_phoneme_shape}
                     update_phoneme_size={this.update_phoneme_size}
                     update_phoneme_location={this.update_phoneme_location}
                     update_phoneme_rotation={this.update_phoneme_rotation}
+                    toggle_real_time={this.toggle_real_time}
                     input_text={this.state.input_text}
                     handleChange={this.handleChange}
                     change_value={this.change_value}
                     style={div_style}
+                    real_time={this.state.real_time}
                     />
 
                 }
