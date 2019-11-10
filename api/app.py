@@ -179,6 +179,7 @@ class PhonemeLocationOption(Resource):
         os.system(com)
         res = {
             "filename": filename,
+            "cb_filename": cb_filename,
             "latter_list": text
         }
         return res
@@ -218,6 +219,7 @@ class PhonemeSizeOption(Resource):
         text[latter_num][phoneme_num]['img'] = target_img.tolist()
         res = {
             "filename": filename,
+            "cb_filename": cb_filename,
             "latter_list": text
         }
         return res
@@ -260,6 +262,7 @@ class PhonemeRotationOption(Resource):
         text[latter_num][phoneme_num]['img'] = target_img.tolist()
         res = {
             "filename": filename,
+            "cb_filename": cb_filename,
             "latter_list": text
         }
         return res
@@ -292,6 +295,7 @@ class ImageOption(Resource):
         res = {
             "latter_list": text,
             "filename": filename,
+            "cb_filename": cb_filename,
             "blur": blur,
             "color": color
         }
@@ -310,10 +314,28 @@ class AddBackGroundImage(Resource):
         img = Image.open(save_dir + filename)
         bg_img = Image.open(save_dir + bg_filename)
         filename = main.combine_bg(img, bg_img, input_text)
-        com = 's3cmd put ./static/image/{} s3://seolo/static/image/'.format(filename)
-        os.system(com)
+
         res = {
             "bg_filename": bg_filename,
+            "cb_filename": filename
+        }
+        return res
+
+
+class SetLocationInBackground(Resource):
+    def put(self):
+        args = parser.parse_args()
+        filename = args['filename']
+        bg_filename = args['bg_filename']
+        input_text = args['input_text']
+        x = int(args['x_in_bg'])
+        y = int(args['y_in_bg'])
+        save_dir = "./static/image/"
+        img = Image.open(save_dir + filename)
+        bg_img = Image.open(save_dir + bg_filename)
+        filename = main.combine_bg(img, bg_img, input_text, x, y)
+
+        res = {
             "cb_filename": filename
         }
         return res
@@ -342,6 +364,7 @@ api.add_resource(PhonemeSizeOption, '/calligraphy/size')
 api.add_resource(PhonemeLocationOption, '/calligraphy/location')
 api.add_resource(PhonemeRotationOption, '/calligraphy/rotation')
 api.add_resource(AddBackGroundImage, '/calligraphy/background')
+api.add_resource(SetLocationInBackground, '/calligraphy/background/location')
 api.add_resource(SampleImage, '/calligraphy/sample')
 
 if __name__ == '__main__':

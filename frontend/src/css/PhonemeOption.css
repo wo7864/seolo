@@ -1,7 +1,6 @@
 .div_style{
     display:inline-block;
-    margin-left:20px;
-    width:400px;
+    width:100%;
 }
 .div_style2{
     display:inline-block;
@@ -22,4 +21,7 @@
     display: inline-block;
     width:50px;
     height:50px;
+}
+.small-range{
+    width:40%!important;
 }

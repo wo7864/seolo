@@ -1,4 +1,11 @@
 .image_style{
     border:"1px solid black";
     border-radius:"5px";
+    max-width:40%;
+    max-height:60%;
+}
+.inline-block{
+    position: relative;
+    top:10px;
+    height:100%;
 }

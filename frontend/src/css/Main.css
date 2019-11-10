@@ -6,7 +6,7 @@
     height: 100%;
     padding-top: 3rem;
     padding-bottom: 8rem;
-    /*background: rgba(185,237,248,0.3);*/
+    background: #3b3f45;
     background-position: center center;
     background-repeat: no-repeat;
     background-size: cover;
@@ -26,3 +26,14 @@
     left:50%;
     top:50%;
 }
+.inline-block{
+    display: inline-block;
+    font-size:1rem;
+}
+.width-50{
+    width:50%;
+}
+.vertical-top{
+    vertical-align: top;
+}
+

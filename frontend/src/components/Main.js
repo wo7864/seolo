@@ -8,10 +8,17 @@ import update from 'react-addons-update';
 import InputText from './InputText';
 import {Spinner} from 'react-bootstrap'
 import '../css/Main.css';
+import '../css/normalize.css';
+import '../css/demo.css';
+import '../css/component.css';
+import '../css/cs-select.css';
+import '../css/cs-skin-boxes.css';
 
-const domain ="http://52.78.32.67:5000/calligraphy";
+const domain ="http://54.180.158.43:5000/calligraphy";
+
 
 export default class Main extends React.Component {
+
     constructor(props){
         super(props);
         this.state={
@@ -27,7 +34,7 @@ export default class Main extends React.Component {
             blur:0,
             image_width:0,
             image_height:0,
-            color:[1, 1, 1],
+            color:'',
             is_invisiable:true,
             selected_file:null,
             bg_filename:'',
@@ -36,10 +43,14 @@ export default class Main extends React.Component {
             x_in_bg:0,
             y_in_bg:0,
             real_time:true,
-            sample:[]
+            sample:[],
+            page2:0,
+            page3:0,
+            page4:0
         };
         this.create_image = this.create_image.bind(this);
         this.handleChange = this.handleChange.bind(this);
+        this.handleKeyPress = this.handleKeyPress.bind(this);
         this.select_phoneme = this.select_phoneme.bind(this);
         this.change_value = this.change_value.bind(this);
         this.set_color = this.set_color.bind(this);
@@ -54,6 +65,9 @@ export default class Main extends React.Component {
         this.checkboxChange = this.checkboxChange.bind(this);
         this.toggle_real_time = this.toggle_real_time.bind(this);
         this.get_sample = this.get_sample.bind(this);
+        this.set_location_in_bg = this.set_location_in_bg.bind(this);
+        this.remove_background = this.remove_background.bind(this);
+        this.nextPage = this.nextPage.bind(this);
     }
 
     create_image(){
@@ -136,7 +150,7 @@ export default class Main extends React.Component {
 
     change_value(e){
         let target = this.state.latter_list[this.state.selected_latter][this.state.selected_phoneme];
-        if(e.target.name.slice(0,1) == 'p'){
+        if(e.target.name.slice(0,1) === 'p'){
             let idx = 0;
             if(e.target.name === 'p1') idx = 0;
             else if(e.target.name === 'p2') idx=1;
@@ -179,6 +193,11 @@ export default class Main extends React.Component {
         nextState[e.target.name] = e.target.value;
         this.setState(nextState);
     }
+    handleKeyPress(e){
+        if(e.key == 'Enter'){
+            this.nextPage();
+          }
+    }
     checkboxChange(){
         let target = this.state.is_invisiable;
         this.setState({
@@ -205,6 +224,7 @@ export default class Main extends React.Component {
             .then( response => {
                 this.setState({
                     filename:response.data.filename,
+                    cb_filename:response.data.cb_filename,
                     latter_list:response.data.latter_list,
                     is_loading:false
                 })
@@ -409,11 +429,11 @@ export default class Main extends React.Component {
     }
     set_color(e){
         let target = this.state.color;
-        if(e.target.name == "red"){
+        if(e.target.name === "red"){
             target[0] = e.target.value*=1;
             this.setState({color: target})
         }
-        else if(e.target.name == "green"){
+        else if(e.target.name === "green"){
             target[1] = e.target.value*=1;
             this.setState({color: target})
         }else{
@@ -452,9 +472,38 @@ export default class Main extends React.Component {
             });
     }
 
+    set_location_in_bg(){
+        this.setState({is_loading:true})
+        axios.put(domain+'/background/location', {
+            input_text: this.state.input_text,
+            filename:this.state.filename,
+            bg_filename:this.state.bg_filename,
+            x_in_bg:this.state.x_in_bg,
+            y_in_bg:this.state.y_in_bg
+        })
+            .then( response => {
+                this.setState({
+                    cb_filename:response.data.cb_filename,
+                    is_loading:false
+                })
+            })
+            .catch( response => {
+                this.setState({
+                    is_loading:false                    
+                })
+                console.log(response);
+            });
+    }
+    remove_background(){
+        this.setState({
+            bg_filename:'',
+            cb_filename:''
+        })
+    }
+
     generatePreviewImgUrl(file, callback) {
         const reader = new FileReader()
-        const url = reader.readAsDataURL(file)
+        reader.readAsDataURL(file)
         reader.onloadend = e => callback(reader.result)
     }
 
@@ -469,6 +518,32 @@ export default class Main extends React.Component {
             selected_file : file,
         })
         this.update_background_image(file);
+    }
+
+    addPage(page){
+        page++;
+        this.setState({
+            page2:page
+        })
+        setTimeout(() => {
+            this.setState({
+                page3:page
+            })
+        }, 500);
+        setTimeout(() => {
+            this.setState({
+                page4:page
+            })
+        }, 510);
+    }
+
+    nextPage(){
+        let page = this.state.page2;
+        if(page==1){
+            this.create_image();
+            console.log('hi');
+        }
+        this.addPage(page);
     }
 
     render(){
@@ -490,48 +565,40 @@ export default class Main extends React.Component {
             latter_idx++;
             korean_latter_list.push(tmp);
         }
-        let html = '';
 
-        if(this.state.page == 0){
-            html = 
-            <InputText
-                input_text={this.state.input_text}
-                create_image={this.create_image}
-                handleChange={this.handleChange}
-                font={this.state.font}
-                sliderChange={this.sliderChange}/>
-        }else if(this.state.page == 1){
-            html = 
-            <div>
-                <ImageOption
-                    blur={this.state.blur}
-                    image_width={this.state.image_width}
-                    image_height={this.state.image_height}
-                    handleChange={this.handleChange}
-                    update_image_option={this.update_image_option}
-                    color={this.state.color}
-                    set_color={this.set_color}
-                    handleImage={this.handleImage}
-                    update_background_image={this.update_background_image}
-                    is_invisiable={this.state.is_invisiable}
-                    checkboxChange={this.checkboxChange}
-                    cb_filename={this.state.cb_filename}
-                    x_in_bg={this.state.x_in_bg}
-                    y_in_bg={this.state.y_in_bg}
-                />
-                <div class="background-style">
+        const li_list = [
+            (<li className={"fs-li " + (this.state.page2 != 0 ? "fs-li-up" : "")}>
+            <label className="fs-field-label fs-anim-upper" htmlFor="q1" >한글을 입력해주세요.</label>
+            <input className="fs-anim-lower fs-input" onChange={this.handleChange} 
+                id="q1" name="input_text" type="text" placeholder="" onKeyPress={this.handleKeyPress}
+                autoComplete="off" required/>
+            </li>),
+            (
+            <li className={"fs-li-down " + (this.state.page4 == 1 ? "fs-li" : "") + (this.state.page2 > 1 ? "fs-li-up" : "")}>
+                <label class="fs-field-label fs-anim-upper" for="q3">폰트를 선택해주세요.</label>
+                <div class="fs-radio-group fs-radio-custom clearfix fs-anim-lower">
+                    <span><input id="q3b" name="font" value="0" onClick={this.props.handleChange} type="radio" value="conversion"/><label for="q3b" class="radio-conversion">날림체</label></span>
+                    <span><input id="q3c" name="font" value="1" onClick={this.props.handleChange} type="radio" value="social"/><label for="q3c" class="radio-social">투박체</label></span>
+                </div>
+            </li>
+            ),
+            (
+            <li className={"fs-li-down " + (this.state.page4 == 2 ? "fs-li" : "") + (this.state.page2 > 2 ? "fs-li-up" : "")}>
+                <div className="inline-block width-50 vertical-top">
 
                 <ShowImage 
-                    filename={this.state.filename}
-                    cb_filename={this.state.cb_filename}
-                    />
+                filename={this.state.filename}
+                cb_filename={this.state.cb_filename}
+                />
                 <PhonemeList 
                     update_image={this.update_image}
                     latter_list={this.state.latter_list}
                     input_text={this.state.input_text}
                     select_phoneme={this.select_phoneme}
                 />
-                {this.state.selected_phoneme != -1 && 
+                </div>
+                <div className="inline-block width-50">
+                {this.state.selected_phoneme !== -1 && 
                 <PhonemeOption 
                     font={this.state.font}
                     phoneme2={this.state.selected_phoneme2}
@@ -550,26 +617,125 @@ export default class Main extends React.Component {
                     style={div_style}
                     real_time={this.state.real_time}
                     sample={this.state.sample}
+                    />}
+                    </div>
+            </li>
+            ),
+            (
+                <li className={"fs-li-down " + (this.state.page4 == 3 ? "fs-li" : "") + (this.state.page2 > 3 ? "fs-li-up" : "")} data-input-trigger >
+                    <label class="fs-field-label fs-anim-upper" data-info="We'll make sure to use it all over">Choose a color for your website.</label>
+							<select class="cs-select cs-skin-boxes fs-anim-lower" name="color" onChange={this.handleChange}>
+								<option value="#000000" disabled selected>Pick a color</option>
+								<option value="#000000" data-class="color-000000">#000000</option>
+								<option value="#444444" data-class="color-444444">#444444</option>
+								<option value="#888888" data-class="color-888888">#888888</option>
+								<option value="#bbbbbb" data-class="color-bbbbbb">#bbbbbb</option>
+								<option value="#ffffff" data-class="color-ffffff">#ffffff</option>
+								<option value="#79a38f" data-class="color-79a38f">#79a38f</option>
+								<option value="#c1d099" data-class="color-c1d099">#c1d099</option>
+								<option value="#f5eaaa" data-class="color-f5eaaa">#f5eaaa</option>
+								<option value="#f5be8f" data-class="color-f5be8f">#f5be8f</option>
+								<option value="#e1837b" data-class="color-e1837b">#e1837b</option>
+								<option value="#9bbaab" data-class="color-9bbaab">#9bbaab</option>
+								<option value="#d1dcb2" data-class="color-d1dcb2">#d1dcb2</option>
+								<option value="#f9eec0" data-class="color-f9eec0">#f9eec0</option>
+								<option value="#f7cda9" data-class="color-f7cda9">#f7cda9</option>
+								<option value="#e8a19b" data-class="color-e8a19b">#e8a19b</option>
+								<option value="#bdd1c8" data-class="color-bdd1c8">#bdd1c8</option>
+								<option value="#e1e7cd" data-class="color-e1e7cd">#e1e7cd</option>
+								<option value="#faf4d4" data-class="color-faf4d4">#faf4d4</option>
+								<option value="#fbdfc9" data-class="color-fbdfc9">#fbdfc9</option>
+								<option value="#f1c1bd" data-class="color-f1c1bd">#f1c1bd</option>
+							</select>
+                </li>
+            ),
+            (
+                <li className={"fs-li-down " + (this.state.page4 == 4 ? "fs-li" : "") + (this.state.page2 > 4 ? "fs-li-up" : "")}>
+                    <ImageOption
+                        blur={this.state.blur}
+                        image_width={this.state.image_width}
+                        image_height={this.state.image_height}
+                        handleChange={this.handleChange}
+                        update_image_option={this.update_image_option}
+                        color={this.state.color}
+                        set_color={this.set_color}
+                        handleImage={this.handleImage}
+                        update_background_image={this.update_background_image}
+                        is_invisiable={this.state.is_invisiable}
+                        checkboxChange={this.checkboxChange}
+                        cb_filename={this.state.cb_filename}
+                        x_in_bg={this.state.x_in_bg}
+                        y_in_bg={this.state.y_in_bg}
+                        set_location_in_bg={this.set_location_in_bg}
+                        remove_background={this.remove_background}
                     />
-
-                }
-                </div>
-            </div>
-                        
-            
+                </li>
+            )
+        ]
+        const btn_list = [];
+        for(let i=0;i<6;i++){
+            let btn = <button class = {this.state.page2 == i ? "fs-dot-current" : ""}></button>
+            btn_list.push(btn)
         }
+        let fs_li = <div>
+                        {li_list[this.state.page3]}
+                    </div>
+        let fs_div = <div className="fs-div">
+                        <div className="fs-fields">{fs_li}</div>
+                    </div>
+        const fs_title = <div className="fs-title">
+                            <h1>서로</h1>
+                            <div className="codrops-top">
+                                <a className="codrops-icon codrops-icon-prev" href="http://tympanus.net/Development/NotificationStyles/"><span>Previous Demo</span></a>
+                                <a className="codrops-icon codrops-icon-drop" href="http://tympanus.net/codrops/?p=19520"><span>Back to the Codrops Article</span></a>
+                                <a className="codrops-icon codrops-icon-info" href="#"><span>This is a demo for a fullscreen form</span></a>
+                            </div>
+                        </div>               
+        let fs_control = <div class="fs-controls">
+                            <button class="fs-continue fs-show" onClick={this.nextPage}>Continue</button>
+                            <nav class="fs-nav-dots fs-show">
+                                {btn_list}
+                            </nav>
+                            <span class="fs-numbers fs-show">
+                                <span class="fs-number-current">{this.state.page2 + 1}</span>
+                                <span class="fs-number-total">6</span>
+                            </span>
+                            <div class="fs-progress fs-show"></div>
+                        </div>
+        let form_wrap = <div className="fs-form-wrap" id="fs-form-wrap">
+                            {fs_title}
+                            {fs_div}
+                            {fs_control}
+                        </div>
+
+        let related = <div className="related">
+                        <p>If you enjoyed this demo you might also like:</p>
+                        <a href="http://tympanus.net/Development/MinimalForm/">
+                            <img src="img/relatedposts/minimalform1-300x162.png" />
+                            <h3>Minimal Form Interface</h3>
+                        </a>
+                        <a href="http://tympanus.net/Development/ButtonComponentMorph/">
+                            <img src="img/relatedposts/MorphingButtons-300x162.png" />
+                            <h3>Morphing Buttons Concept</h3>
+                        </a>
+                    </div>
+        let container = <div className="container">
+                            {form_wrap}
+                            {related}
+                        </div>
         const loading = (
-            <div class="loading-div">
-                <div class="spinner">
+            <div className="loading-div">
+                <div className="spinner">
                     <Spinner animation="border" variant="info" />
                 </div>
             </div>
         )
+
         return(
-            <div>
-                {html}
+        <div class="container">
+                {container}
                 {this.state.is_loading && loading}
-            </div>
+        </div>
         )
     }
 }

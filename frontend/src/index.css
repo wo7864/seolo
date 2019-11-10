@@ -11,9 +11,7 @@ code {
     monospace;
 }
 
-h1, h2, h3, h4, h5{
-  font-family: 'Black Han Sans', sans-serif;
-}
+
 .font1{
   font-family: 'Gamja Flower', cursive;
 }
@@ -26,4 +24,7 @@ h1, h2, h3, h4, h5{
 span, li, p{
   font-family: 'Noto Sans KR', sans-serif;
 
+}
+.App{
+  height:100%;
 }

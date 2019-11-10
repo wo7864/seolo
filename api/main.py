@@ -590,7 +590,7 @@ def create_sample_image(font, text, model, sess, param_list):
 
 def update_rotation(img2, rotation):
     img2 = img2.astype(np.uint8)
-    matrix = cv2.getRotationMatrix2D((img2.shape[1]/2, img2.shape[0]/2), int(rotation), 1)
+    matrix = cv2.getRotationMatrix2D((img2.shape[1]/2, img2.shape[0]/2), int(rotation)*-1, 1)
     img2 = cv2.warpAffine(img2, matrix, (img2.shape[1], img2.shape[0]),  borderMode=cv2.BORDER_REPLICATE)
     return img2
 
@@ -717,4 +717,6 @@ def combine_bg(result, bg_file, text, x=0, y=0):
     bg_file.paste(result, (x, y), result)
     filename = "cb_" + text + now.strftime("_%m_%d_%Y_%H_%M_%S.png")
     bg_file.save(save_dir + filename)
+    com = 's3cmd put ./static/image/{} s3://seolo/static/image/'.format(filename)
+    os.system(com)
     return filename
