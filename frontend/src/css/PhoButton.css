@@ -18,6 +18,31 @@
     z-index:10;
     outline: 0;
 }
+
+.pho_list_div_style{
+    display:inline-block;
+    padding:10px;
+    margin:10px;
+    border:2px solid black;
+    border-radius:15px;
+
+}
+
+.latter_div{
+    display:inline-block;
+    position:relative;
+    margin:5px;
+    padding:2px;
+    width:80px;
+    height:80px;
+    border:0.5px solid #ccc;
+    border-radius:5px;
+    text-align:center;
+    vertical-align:middle;
+    background-color:white;
+    
+}
+
 .shape0.phoneme0{
     top:25px;
     left:15px;

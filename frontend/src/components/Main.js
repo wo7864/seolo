@@ -6,6 +6,7 @@ import PhonemeOption from './PhonemeOption';
 import ImageOption from './ImageOption';
 import update from 'react-addons-update';
 import InputText from './InputText';
+import AddBackground from './AddBackground';
 import {Spinner} from 'react-bootstrap'
 import '../css/Main.css';
 import '../css/normalize.css';
@@ -14,7 +15,7 @@ import '../css/component.css';
 import '../css/cs-select.css';
 import '../css/cs-skin-boxes.css';
 
-const domain ="http://54.180.158.43:5000/calligraphy";
+const domain ="http://13.124.118.44:5000/calligraphy";
 
 
 export default class Main extends React.Component {
@@ -34,8 +35,8 @@ export default class Main extends React.Component {
             blur:0,
             image_width:0,
             image_height:0,
-            color:'',
-            is_invisiable:true,
+            color:'000000',
+            is_invisiable:false,
             selected_file:null,
             bg_filename:'',
             cb_filename:'',
@@ -46,7 +47,7 @@ export default class Main extends React.Component {
             sample:[],
             page2:0,
             page3:0,
-            page4:0
+            page4:0,
         };
         this.create_image = this.create_image.bind(this);
         this.handleChange = this.handleChange.bind(this);
@@ -68,6 +69,15 @@ export default class Main extends React.Component {
         this.set_location_in_bg = this.set_location_in_bg.bind(this);
         this.remove_background = this.remove_background.bind(this);
         this.nextPage = this.nextPage.bind(this);
+        this.toVector = this.toVector.bind(this);
+    }
+
+    is_hangul_char(ch) {
+        let c = ch.charCodeAt(0);
+        if( 0x1100<=c && c<=0x11FF ) return true;
+        if( 0x3130<=c && c<=0x318F ) return true;
+        if( 0xAC00<=c && c<=0xD7A3 ) return true;
+        return false;
     }
 
     create_image(){
@@ -90,7 +100,7 @@ export default class Main extends React.Component {
                     page:1,
                     is_loading:false
                 })
-                console.log(response);
+                this.addPage(1);
             })
             .catch( response => {
                 this.setState({
@@ -199,13 +209,14 @@ export default class Main extends React.Component {
           }
     }
     checkboxChange(){
-        let target = this.state.is_invisiable;
+        let target = !this.state.is_invisiable;
         this.setState({
-            is_invisiable:!target
+            is_invisiable:target
         })
+        this.update_image_option(this.state.color, target);
     }
 
-    update_image_option(){
+    update_image_option(color = this.state.color, is_invisiable = this.state.is_invisiable){
         this.setState({
             is_loading:true
         })
@@ -214,8 +225,8 @@ export default class Main extends React.Component {
             blur:this.state.blur,
             image_width:this.state.image_width,
             image_height:this.state.image_height,
-            color:[this.state.color],
-            is_invisiable:this.state.is_invisiable ? 1 : 0,
+            color:color,
+            is_invisiable:is_invisiable,
             input_text:this.state.input_text,
             bg_filename:this.state.bg_filename,
             x_in_bg:this.state.x_in_bg,
@@ -228,6 +239,7 @@ export default class Main extends React.Component {
                     latter_list:response.data.latter_list,
                     is_loading:false
                 })
+                console.log(response);
             })
             .catch( response => {
                 this.setState({
@@ -236,7 +248,12 @@ export default class Main extends React.Component {
                 console.log(response);
             });
     }
-
+    set_color(color){
+        this.setState({
+            color:color
+        })
+        this.update_image_option(color=color, this.state.is_invisiable);
+    }
 
     toggle_real_time(){
 
@@ -274,8 +291,8 @@ export default class Main extends React.Component {
                     filename:response.data.filename,
                     cb_filename:response.data.cb_filename,
                     latter_list:response.data.latter_list,
-                    is_loading:false
                 })
+                this.get_sample(this.state.selected_latter, this.state.selected_phoneme, this.state.selected_phoneme2);
             })
             .catch( response => {
                 this.setState({
@@ -407,7 +424,7 @@ export default class Main extends React.Component {
             blur:this.state.blur,
             image_width:this.state.image_width,
             image_height:this.state.image_height,
-            is_invisiable:this.state.is_invisiable ? 1 : 0,
+            is_invisiable:this.state.is_invisiable,
             color:[this.state.color],
             bg_filename:this.state.bg_filename,
             x_in_bg:this.state.x_in_bg,
@@ -427,20 +444,7 @@ export default class Main extends React.Component {
                 console.log(response);
             });
     }
-    set_color(e){
-        let target = this.state.color;
-        if(e.target.name === "red"){
-            target[0] = e.target.value*=1;
-            this.setState({color: target})
-        }
-        else if(e.target.name === "green"){
-            target[1] = e.target.value*=1;
-            this.setState({color: target})
-        }else{
-            target[2] = e.target.value*=1;
-            this.setState({color: target})
-        }
-    }
+
 
     update_background_image(file){
         this.setState({
@@ -508,6 +512,10 @@ export default class Main extends React.Component {
     }
 
     handleImage(e){
+        if(!this.state.is_invisiable){
+            alert("투명성을 체크해야 해당 속성을 이용할 수 있습니다.");
+            return;
+        }
         const file = e.target.files[0]
         if (!file) return
 
@@ -539,12 +547,80 @@ export default class Main extends React.Component {
 
     nextPage(){
         let page = this.state.page2;
-        if(page==1){
-            this.create_image();
-            console.log('hi');
+        if(page==0){
+            if(this.state.input_text.length == 0){
+                alert("한글을 입력해주세요!");
+                return;
+            }
+            for(let c of this.state.input_text){
+                if(!this.is_hangul_char(c)) {
+                    alert("한글을 입력해주세요!");
+                    return;
+                }
+            }
+            this.addPage(page);
         }
-        this.addPage(page);
+        else if(page==1){
+            this.create_image();
+        }else{
+            this.addPage(page);
+        }
     }
+
+    movePage(num){
+        if(num<=1){
+            const check = window.confirm("돌아가면 기존 작품은 삭제됩니다. 괜찮으세요?");
+            if(!check) {
+                this.setState({
+                    page:0,
+                    font:0,
+                    input_text:'',
+                    latter_list:[],
+                    select_phoneme:-1,
+                    filename:'',
+                    selected_latter:-1,
+                    selected_phoneme:-1,
+                    selected_phoneme2:'',
+                    blur:0,
+                    image_width:0,
+                    image_height:0,
+                    color:'000000',
+                    is_invisiable:false,
+                    selected_file:null,
+                    bg_filename:'',
+                    cb_filename:'',
+                    is_loading:false,
+                    x_in_bg:0,
+                    y_in_bg:0,
+                    real_time:true,
+                })
+                return;
+            }
+        }
+        if(num>=2 && this.state.filename == ''){
+            alert("이전 과정을 완료해주세요.");
+            return;
+        }
+        this.setState({
+            page2:num
+        })
+        setTimeout(() => {
+            this.setState({
+                page3:num
+            })
+        }, 500);
+        setTimeout(() => {
+            this.setState({
+                page4:num
+            })
+        }, 510);
+    }
+    toVector(){
+        this.setState({
+            is_loading:true
+        })
+    }
+
 
     render(){
         const div_style={
@@ -565,7 +641,7 @@ export default class Main extends React.Component {
             latter_idx++;
             korean_latter_list.push(tmp);
         }
-
+        
         const li_list = [
             (<li className={"fs-li " + (this.state.page2 != 0 ? "fs-li-up" : "")}>
             <label className="fs-field-label fs-anim-upper" htmlFor="q1" >한글을 입력해주세요.</label>
@@ -577,13 +653,15 @@ export default class Main extends React.Component {
             <li className={"fs-li-down " + (this.state.page4 == 1 ? "fs-li" : "") + (this.state.page2 > 1 ? "fs-li-up" : "")}>
                 <label class="fs-field-label fs-anim-upper" for="q3">폰트를 선택해주세요.</label>
                 <div class="fs-radio-group fs-radio-custom clearfix fs-anim-lower">
-                    <span><input id="q3b" name="font" value="0" onClick={this.props.handleChange} type="radio" value="conversion"/><label for="q3b" class="radio-conversion">날림체</label></span>
-                    <span><input id="q3c" name="font" value="1" onClick={this.props.handleChange} type="radio" value="social"/><label for="q3c" class="radio-social">투박체</label></span>
+                    <span><input id="q3b" name="font" value="0" onClick={this.handleChange} type="radio"/><label for="q3b" class="radio-conversion">날림체</label></span>
+                    <span><input id="q3c" name="font" value="1" onClick={this.handleChange} type="radio"/><label for="q3c" class="radio-social">투박체</label></span>
+                    <span><input id="q3a" name="font" value="2" onClick={this.handleChange} type="radio"/><label for="q3a" class="radio-mobile">장군체</label></span>
                 </div>
             </li>
             ),
             (
             <li className={"fs-li-down " + (this.state.page4 == 2 ? "fs-li" : "") + (this.state.page2 > 2 ? "fs-li-up" : "")}>
+                <label class="fs-field-label fs-anim-upper" >각 자, 모음의 모양을 결정합니다.</label><br/>
                 <div className="inline-block width-50 vertical-top">
 
                 <ShowImage 
@@ -623,58 +701,74 @@ export default class Main extends React.Component {
             ),
             (
                 <li className={"fs-li-down " + (this.state.page4 == 3 ? "fs-li" : "") + (this.state.page2 > 3 ? "fs-li-up" : "")} data-input-trigger >
-                    <label class="fs-field-label fs-anim-upper" data-info="We'll make sure to use it all over">Choose a color for your website.</label>
-							<select class="cs-select cs-skin-boxes fs-anim-lower" name="color" onChange={this.handleChange}>
-								<option value="#000000" disabled selected>Pick a color</option>
-								<option value="#000000" data-class="color-000000">#000000</option>
-								<option value="#444444" data-class="color-444444">#444444</option>
-								<option value="#888888" data-class="color-888888">#888888</option>
-								<option value="#bbbbbb" data-class="color-bbbbbb">#bbbbbb</option>
-								<option value="#ffffff" data-class="color-ffffff">#ffffff</option>
-								<option value="#79a38f" data-class="color-79a38f">#79a38f</option>
-								<option value="#c1d099" data-class="color-c1d099">#c1d099</option>
-								<option value="#f5eaaa" data-class="color-f5eaaa">#f5eaaa</option>
-								<option value="#f5be8f" data-class="color-f5be8f">#f5be8f</option>
-								<option value="#e1837b" data-class="color-e1837b">#e1837b</option>
-								<option value="#9bbaab" data-class="color-9bbaab">#9bbaab</option>
-								<option value="#d1dcb2" data-class="color-d1dcb2">#d1dcb2</option>
-								<option value="#f9eec0" data-class="color-f9eec0">#f9eec0</option>
-								<option value="#f7cda9" data-class="color-f7cda9">#f7cda9</option>
-								<option value="#e8a19b" data-class="color-e8a19b">#e8a19b</option>
-								<option value="#bdd1c8" data-class="color-bdd1c8">#bdd1c8</option>
-								<option value="#e1e7cd" data-class="color-e1e7cd">#e1e7cd</option>
-								<option value="#faf4d4" data-class="color-faf4d4">#faf4d4</option>
-								<option value="#fbdfc9" data-class="color-fbdfc9">#fbdfc9</option>
-								<option value="#f1c1bd" data-class="color-f1c1bd">#f1c1bd</option>
-							</select>
+                    <label class="fs-field-label fs-anim-upper" data-info="We'll make sure to use it all over">이미지의 전체적인 옵션을 결정합니다.</label>
+                    <br/>
+                    <div className="inline-block width-50 vertical-top">
+                        <ShowImage 
+                        filename={this.state.filename}
+                        cb_filename={this.state.cb_filename}
+                        />
+                    </div>
+                    <div className="inline-block width-50 vertical-top margin-top-10">
+                        <ImageOption
+                            blur={this.state.blur}
+                            image_width={this.state.image_width}
+                            image_height={this.state.image_height}
+                            handleChange={this.handleChange}
+                            update_image_option={this.update_image_option}
+                            color={this.state.color}
+                            set_color={this.set_color}
+                            is_invisiable={this.state.is_invisiable}
+                            checkboxChange={this.checkboxChange}
+                        />
+
+                    </div>
                 </li>
             ),
             (
                 <li className={"fs-li-down " + (this.state.page4 == 4 ? "fs-li" : "") + (this.state.page2 > 4 ? "fs-li-up" : "")}>
-                    <ImageOption
-                        blur={this.state.blur}
-                        image_width={this.state.image_width}
-                        image_height={this.state.image_height}
-                        handleChange={this.handleChange}
-                        update_image_option={this.update_image_option}
-                        color={this.state.color}
-                        set_color={this.set_color}
-                        handleImage={this.handleImage}
-                        update_background_image={this.update_background_image}
-                        is_invisiable={this.state.is_invisiable}
-                        checkboxChange={this.checkboxChange}
+                    <label class="fs-field-label fs-anim-upper" data-info="We'll make sure to use it all over">원하는 배경을 삽입합니다.</label>
+                    <br/>
+                    <div className="inline-block width-50 vertical-top">
+                        <ShowImage 
+                        filename={this.state.filename}
                         cb_filename={this.state.cb_filename}
-                        x_in_bg={this.state.x_in_bg}
-                        y_in_bg={this.state.y_in_bg}
-                        set_location_in_bg={this.set_location_in_bg}
-                        remove_background={this.remove_background}
-                    />
+                        />
+                    </div>
+                    <div className="inline-block width-50 vertical-top">
+                        <AddBackground
+                            handleImage={this.handleImage}
+                            handleChange={this.handleChange}
+                            set_location_in_bg={this.set_location_in_bg}
+                            remove_background={this.remove_background}
+                            x_in_bg={this.state.x_in_bg}
+                            y_in_bg={this.state.y_in_bg}
+                            cb_filename={this.state.cb_filename}/>
+
+                    </div>
+                </li>
+            ),
+            (
+                <li className={"fs-li-down " + (this.state.page4 == 5 ? "fs-li" : "") + (this.state.page2 > 5 ? "fs-li-up" : "")}>
+                    <div className="inline-block width-100 vertical-top">
+                        <ShowImage 
+                        filename={this.state.filename}
+                        cb_filename={this.state.cb_filename}
+                        />
+                    </div>
+                    <div class="text-center">
+                        <button className="white bmp-to-vector" onClick={this.toVector}>Bitmap to Vector</button><br/>
+                        <label class="fs-field-label fs-anim-upper" data-info="We'll make sure to use it all over">이미지를 부드럽게 만들어 줍니다.</label>
+                    </div>
+                    
                 </li>
             )
         ]
         const btn_list = [];
         for(let i=0;i<6;i++){
-            let btn = <button class = {this.state.page2 == i ? "fs-dot-current" : ""}></button>
+            let btn = <button class = {this.state.page2 == i ? "fs-dot-current" : ""}
+                        onClick={this.movePage.bind(this, i)}>                
+            </button>
             btn_list.push(btn)
         }
         let fs_li = <div>
@@ -690,7 +784,7 @@ export default class Main extends React.Component {
                                 <a className="codrops-icon codrops-icon-drop" href="http://tympanus.net/codrops/?p=19520"><span>Back to the Codrops Article</span></a>
                                 <a className="codrops-icon codrops-icon-info" href="#"><span>This is a demo for a fullscreen form</span></a>
                             </div>
-                        </div>               
+                        </div>
         let fs_control = <div class="fs-controls">
                             <button class="fs-continue fs-show" onClick={this.nextPage}>Continue</button>
                             <nav class="fs-nav-dots fs-show">

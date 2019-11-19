@@ -8,7 +8,7 @@ div.cs-skin-boxes {
 	background: transparent;
 	font-size: 0.65em;
 	font-weight: 700;
-	max-width: 300px;
+	max-width: 200px;
 	z-index: 2000;
 	color: #fff;
 }
@@ -20,9 +20,9 @@ div.cs-skin-boxes {
 .cs-skin-boxes > span {
 	border: 3px solid #292c30;
 	border-radius: 5px;
-	width: 150px;
-	height: 140px;
-	font-size: 0.5em;
+	width: 180px;
+	height: 160px;
+	font-size: 01.0em;
 	padding: 0 0 0 10px;
 	background: #555b64;
 }
@@ -34,7 +34,7 @@ div.cs-skin-boxes:focus > span {
 .cs-skin-boxes > span::before {
 	content: '';
 	display: block;
-	padding-top: 110px;
+	padding-top: 130px;
 	margin-left: -10px;
 	box-shadow: 0 25px 0 #292c30, inset 0 -10px #292c30;
 }

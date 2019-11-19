@@ -4,7 +4,7 @@ import infogan
 def load():
     sess_list = []
     model_list = []
-    font_list = ['type6', 'type7']
+    font_list = ['type6', 'type7', 'type8']
     for font in font_list:
         sess_list2 = []
         model_list2 = []
@@ -12,7 +12,7 @@ def load():
             print('===================================')
             tf.reset_default_graph()
             sess = tf.compat.v1.Session()
-            model = infogan.GAN(sess)
+            model = infogan.GAN()
             save_dir = "./infogan_model/{}/".format(font)
             filename = "{}_{}.ckpt".format(font, phoneme)
             print(filename)

@@ -20,7 +20,7 @@
     list-style: none;
   }
   
-  .custom-range{
+  .width-75{
       width:75% !important;
   }
 
@@ -105,19 +105,7 @@
 .align-right{
   width:100px;
 }
-.save-btn{
-    width:60px;
-    height:40px;
 
-    margin-top:10px;
-    margin-left:70%;
-
-    text-align: center;
-    color: #fff;
-    background: rgba(52, 58, 64, 0.5);
-    z-index: 999;
-    border:0px;
-}
 .save-btn:hover{
     background: #343a40;
 }
@@ -133,26 +121,6 @@
 
 }
 
-.file-label{ 
-    display: inline-block; 
-    padding: .5em .75em; 
-    color: #fff; 
-    margin-left:55%;
-    background: rgba(52, 58, 64, 0.5);
-    cursor: pointer; 
-    border: 0px;
-    border-radius: .25em; 
-} 
-.file-input{
-    position: absolute; 
-    width: 1px; 
-    height: 1px; 
-    padding: 0; 
-    margin: -1px; 
-    overflow: hidden; 
-    clip:rect(0,0,0,0); 
-    border: 0; 
-}
 
 .bg-div{
     display: block;
@@ -171,16 +139,3 @@
   height:25px;
 }
 
-.delete-btn{
-  width:80px;
-  height:40px;
-
-  margin-top:10px;
-  margin-left:65%;
-
-  text-align: center;
-  color: #fff;
-  background: rgba(52, 58, 64, 0.5);
-  z-index: 999;
-  border:0px;
-}

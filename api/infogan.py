@@ -6,7 +6,7 @@ import numpy as np
 
 class GAN:
 
-    def __init__(self, sess):
+    def __init__(self):
         self.train_rate_D_Q = 0.0002
         self.train_rate_G = 0.001
         self.channel = 1  # mnist는 흑백
@@ -83,8 +83,6 @@ class GAN:
         '''
         with tf.name_scope("saver"):
             self.saver = tf.train.Saver(tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="Generator"))
-
-        sess.run(tf.global_variables_initializer())
 
     # 노이즈 생성
     def Generate_noise(self, batch_size):  # batch_size, 1, 1, self.noise_dim

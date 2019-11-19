@@ -397,9 +397,12 @@ def create_latter_list(font, model_list, sess_list, text, shape_list, param_list
 
 
 def set_color_rgba(result, color):
-    r = np.full([result.shape[0], result.shape[1]], color[0])
-    g = np.full([result.shape[0], result.shape[1]], color[1])
-    b = np.full([result.shape[0], result.shape[1]], color[2])
+    r_color = int("0x" + color[:2], 16)
+    g_color = int("0x" + color[2:4], 16)
+    b_color = int("0x" + color[4:], 16)
+    r = np.full([result.shape[0], result.shape[1]], r_color)
+    g = np.full([result.shape[0], result.shape[1]], g_color)
+    b = np.full([result.shape[0], result.shape[1]], b_color)
     r = r[:] / 1
     g = g[:] / 1
     b = b[:] / 1
@@ -487,7 +490,7 @@ def img_attach(latter_list, blur_value, color, is_invisiable, ori_text, bg_data,
     result = cv2.resize(result, (image_width, image_height), interpolation=cv2.INTER_LINEAR)
 
     # 색 지정
-    if is_invisiable:
+    if is_invisiable == 'True':
         result = set_color_rgba(result, color)
     else:
         result = set_color_rgb(result)

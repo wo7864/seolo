@@ -9,12 +9,10 @@ export default class ShowImage extends React.Component {
         }
         const img_dir = 'http://seolo.s3-website.ap-northeast-2.amazonaws.com/static/image/'+filename;
         const image = (
-            <a href={img_dir} >
                 <img src={img_dir} className="image_style" alt=""/>
-            </a>
         )
         return(
-            <div className="text-center my-auto inline-block">
+            <div className="text-center my-auto image-div">
                 {image}
             </div>
         )

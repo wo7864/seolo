@@ -1,0 +1,60 @@
+
+.file-label{ 
+    display: inline-block; 
+    cursor: pointer; 
+    border:3px solid #232529;
+    border-radius: 10px;
+    background-color:#c3c5c9;
+    color:#232529;
+    width:30vh;
+    height:20vh;
+    text-align:center;
+    line-height:18vh;
+    margin-top:5vh;
+    margin-left:40%;
+
+    font-size:40px;
+    font-weight: bold;
+} 
+.file-label:hover{
+    -webkit-transition: opacity 0.3s, -webkit-transform 0.3s;
+    transition: opacity 0.3s, transform 0.3s;
+    -webkit-transform: translate3d(0,-5px,0);
+    transform: translate3d(0,-5px,0);
+
+    background-color:#3b3f45;
+}
+.file-input{
+    position: absolute; 
+    width: 1px; 
+    height: 1px; 
+    padding: 0; 
+    margin: -1px; 
+    overflow: hidden; 
+    clip:rect(0,0,0,0); 
+    border: 0; 
+}
+.delete-btn{
+    display: inline-block; 
+    border:3px solid #232529!important;
+    border-radius: 10px!important;
+    background-color:#c3c5c9!important;
+    color:rgb(255, 124, 124);
+    width:30vh;
+    height:20vh;
+    text-align:center;
+    line-height:18vh;
+    margin-top:30px;
+
+    font-size:40px;
+    font-weight: bold;
+  }
+.delete-btn:hover{
+    -webkit-transition: opacity 0.3s, -webkit-transform 0.3s;
+    transition: opacity 0.3s, transform 0.3s;
+    -webkit-transform: translate3d(0,-5px,0);
+    transform: translate3d(0,-5px,0);
+
+    background-color:#3b3f45!important;
+    color:white;
+}

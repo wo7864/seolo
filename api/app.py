@@ -52,8 +52,8 @@ class Calligraphy(Resource):
         input_text = args['input_text']
         param_list = [50] * 4
         blur = 0
-        color = [0, 0, 0]
-        is_invisiable = True
+        color = '000000'
+        is_invisiable = 'False'
         text, shape_list = main.convert_text(input_text)
         latter_list, json_latter_list = main.create_latter_list(font, model_list, sess_list, text, shape_list, param_list)
         filename, _, image_width, image_height = main.img_attach(latter_list, blur, color, is_invisiable, input_text, None)
@@ -78,7 +78,7 @@ class Calligraphy(Resource):
         blur = int(args['blur'])
         image_width = int(args['image_width'])
         image_height = int(args['image_height'])
-        color = json.loads(args['color'])
+        color = args['color']
         is_invisiable = bool(args['is_invisiable'])
         bg_filename = args['bg_filename']
         bg_data = None
@@ -123,8 +123,12 @@ class PhonemeShapeOption(Resource):
         blur = int(args['blur'])
         image_width = int(args['image_width'])
         image_height = int(args['image_height'])
-        color = json.loads(args['color'])
-        is_invisiable = bool(args['is_invisiable'])
+        color = args['color']
+        is_invisiable = args['is_invisiable']
+        if is_invisiable == 'false':
+            is_invisiable = False
+        if is_invisiable == 'true':
+            is_invisiable = True
         bg_filename = args['bg_filename']
         bg_data = None
         if bg_filename:
@@ -159,11 +163,15 @@ class PhonemeLocationOption(Resource):
         args = parser.parse_args()
         text = args['latter_list']
         input_text = args['input_text']
-        color = json.loads(args['color'])
+        color = args['color']
         blur = int(args['blur'])
         image_width = int(args['image_width'])
         image_height = int(args['image_height'])
-        is_invisiable = bool(args['is_invisiable'])
+        is_invisiable = args['is_invisiable']
+        if is_invisiable == 'false':
+            is_invisiable = False
+        if is_invisiable == 'true':
+            is_invisiable = True
         bg_filename = args['bg_filename']
         bg_data = None
         if bg_filename:
@@ -193,11 +201,15 @@ class PhonemeSizeOption(Resource):
         latter_num = int(args['latter_num'])
         phoneme_num = int(args['phoneme_num'])
         input_text = args['input_text']
-        color = json.loads(args['color'])
+        color = args['color']
         blur = int(args['blur'])
         image_width = int(args['image_width'])
         image_height = int(args['image_height'])
-        is_invisiable = bool(args['is_invisiable'])
+        is_invisiable = args['is_invisiable']
+        if is_invisiable == 'false':
+            is_invisiable = False
+        if is_invisiable == 'true':
+            is_invisiable = True
         bg_filename = args['bg_filename']
         bg_data = None
         if bg_filename:
@@ -234,11 +246,15 @@ class PhonemeRotationOption(Resource):
         phoneme_num = int(args['phoneme_num'])
         input_text = args['input_text']
         font = int(args['font'])
-        color = json.loads(args['color'])
+        color = args['color']
         blur = int(args['blur'])
         image_width = int(args['image_width'])
         image_height = int(args['image_height'])
-        is_invisiable = bool(args['is_invisiable'])
+        is_invisiable = args['is_invisiable']
+        if is_invisiable == 'false':
+            is_invisiable = False
+        if is_invisiable == 'true':
+            is_invisiable = True
         bg_filename = args['bg_filename']
         bg_data = None
         if bg_filename:
@@ -276,8 +292,12 @@ class ImageOption(Resource):
         blur = int(args['blur'])
         image_width = int(args['image_width'])
         image_height = int(args['image_height'])
-        color = json.loads(args['color'])
-        is_invisiable = int(args['is_invisiable'])
+        color = args['color']
+        is_invisiable = args['is_invisiable']
+        if is_invisiable == 'false':
+            is_invisiable = False
+        if is_invisiable == 'true':
+            is_invisiable = True
         bg_filename = args['bg_filename']
         bg_data = None
         if bg_filename:

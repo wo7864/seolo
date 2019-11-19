@@ -3,30 +3,7 @@ import PhoButton from './PhoButton';
 import '../css/PhoButton.css';
 export default class PhonemeList extends React.Component {
     render(){
-        const div_style = {
-            display:"inline-block",
-            padding:"10px",
-            margin:"10px",
-            border:"1px solid rgba(57,186,232,1)",
-            borderRadius:"5px",
-            backgroundColor:"rgba(57,186,232,0.2)"
 
-        }
-
-        const latter_div ={
-            display:"inline-block",
-            position:"relative",
-            margin:"5px",
-            padding:"2px",
-            width:"80px",
-            height:"80px",
-            border:"0.5px solid #ccc",
-            borderRadius:"3px",
-            textAlign:"center",
-            verticalAlign:"middle",
-            backgroundColor:"white"
-
-        }
         let key = '';
         const data = this.props.latter_list.map((data2, i) =>{
             let shape;
@@ -42,12 +19,12 @@ export default class PhonemeList extends React.Component {
                 }
             })
 
-            let list2 = <div style={latter_div} key={i}>{list}</div>
+            let list2 = <div class="latter_div" key={i}>{list}</div>
             return list2;
         })
         return(
             <div className="text-center my-auto">
-                <div style={div_style}>
+                <div class="pho_list_div_style">
                     {data}
                 </div>
             </div>
