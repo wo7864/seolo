@@ -15,8 +15,7 @@ import '../css/component.css';
 import '../css/cs-select.css';
 import '../css/cs-skin-boxes.css';
 
-const domain ="http://13.124.118.44:5000/calligraphy";
-
+const domain ="http://127.0.0.1:5000/calligraphy";
 
 export default class Main extends React.Component {
 

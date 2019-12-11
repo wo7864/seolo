@@ -351,8 +351,10 @@ def json_to_obj(text):
     return latter_list
 
 
-def create_latter_list(font, model_list, sess_list, text, shape_list, param_list2):
+def create_latter_list(font, text, shape_list):
     # 각 음소간에 좌표를 지정하여 phoneme 인스턴스 생성
+    if font == 0:
+        font = 'type8'
     latter_list = []
     small_list = [3, 4, 5, 15, 16, 17]
     x_point = 0
@@ -364,9 +366,13 @@ def create_latter_list(font, model_list, sess_list, text, shape_list, param_list
         json_pho_list = []
         for idx2, pho in enumerate(latter):
             if text[idx][idx2] != 26:
-                img = gen_image(pho, model_list[font][pho], sess_list[font][pho], param_list2)
+                filename = "{}_{}_{}_{}_{}.png".format(font, pho+1, 0, 0.0, 0.0)
+                print("./static/image/{}/{}/{}".format(font, pho+1, filename))
+                img = cv2.imread("./static/image/{}/{}/{}/{}".format(font, pho+1, '0', filename))
+                print(img)
+                img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
                 phoneme = Phoneme(img, shape_list[idx], idx, idx2, x_point, y_point,
-                                  param_list2, phoneme_list[text[idx][idx2]], img.shape[1], img.shape[0], rotation)
+                                  [0, 0.0, 0.0], phoneme_list[text[idx][idx2]], img.shape[1], img.shape[0], rotation)
                 phoneme.set_location()
                 phoneme_list2.append(phoneme)
                 param_list = [50] * 4

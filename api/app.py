@@ -16,7 +16,6 @@ from werkzeug.datastructures import FileStorage
 import io
 from PIL import Image
 
-model_list, sess_list = load_model.load()
 app = Flask(__name__)
 CORS(app)
 
@@ -42,10 +41,6 @@ phoneme_list = ['ㄱ', 'ㄴ', 'ㄷ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅅ', 'ㅇ', 'ㅈ', '
 
 
 class Calligraphy(Resource):
-
-    def get(self):
-        return 'hi'
-
     def post(self):
         args = parser.parse_args()
         font = int(args['font'])
@@ -55,7 +50,7 @@ class Calligraphy(Resource):
         color = '000000'
         is_invisiable = 'False'
         text, shape_list = main.convert_text(input_text)
-        latter_list, json_latter_list = main.create_latter_list(font, model_list, sess_list, text, shape_list, param_list)
+        latter_list, json_latter_list = main.create_latter_list(font, text, shape_list)
         filename, _, image_width, image_height = main.img_attach(latter_list, blur, color, is_invisiable, input_text, None)
         com = 's3cmd put ./static/image/{} s3://seolo/static/image/'.format(filename)
         os.system(com)
@@ -388,4 +383,4 @@ api.add_resource(SetLocationInBackground, '/calligraphy/background/location')
 api.add_resource(SampleImage, '/calligraphy/sample')
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', debug=True)
