@@ -87,7 +87,7 @@ class Calligraphy(Resource):
         latter_list = main.json_to_obj(text)
         target = latter_list[latter_num][phoneme_num]
         model_num = phoneme_list.index(target.phoneme)
-        target_img = main.gen_image(model_num, model_list[font][model_num],  sess_list[font][model_num], target.param_list)
+        target_img = main.load_image(font, model_num, target.param_list)
         target_img = cv2.resize(target_img, (int(target.width), int(target.height)), interpolation=cv2.INTER_LINEAR)
         target_img = main.update_rotation(target_img, target.rotation)
         target.img = target_img
@@ -95,9 +95,6 @@ class Calligraphy(Resource):
                                                                            is_invisiable, input_text, bg_data,
                                                                            image_width, image_height)
         text[latter_num][phoneme_num]['img'] = target_img.tolist()
-
-        target_img = main.gen_image(model_num, model_list[font][model_num],  sess_list[font][model_num], target.param_list)
-
         res = {
             "filename": filename,
             "cb_filename": cb_filename,
@@ -136,7 +133,7 @@ class PhonemeShapeOption(Resource):
         latter_list = main.json_to_obj(text)
         target = latter_list[latter_num][phoneme_num]
         model_num = phoneme_list.index(target.phoneme)
-        target_img = main.gen_image(model_num, model_list[font][model_num],  sess_list[font][model_num], target.param_list)
+        target_img = main.load_image(font, model_num, target.param_list)
         target_img = cv2.resize(target_img, (int(target.width), int(target.height)), interpolation=cv2.INTER_LINEAR)
         target_img = main.update_rotation(target_img, target.rotation)
         target.img = target_img
@@ -262,7 +259,8 @@ class PhonemeRotationOption(Resource):
         latter_list = main.json_to_obj(text)
         target = latter_list[latter_num][phoneme_num]
         model_num = phoneme_list.index(target.phoneme)
-        target_img = main.gen_image(model_num, model_list[font][model_num],  sess_list[font][model_num], target.param_list)
+        print(target.param_list)
+        target_img = main.load_image(font, model_num, target.param_list)
         target_img = cv2.resize(target_img, (int(target.width), int(target.height)), interpolation=cv2.INTER_LINEAR)
         target_img = main.update_rotation(target_img, target.rotation)
         target.img = target_img
@@ -356,22 +354,6 @@ class SetLocationInBackground(Resource):
         return res
 
 
-class SampleImage(Resource):
-    def post(self):
-        args = parser.parse_args()
-        text = args['latter_list']
-        font = int(args['font'])
-        latter_num = int(args['latter_num'])
-        phoneme_num = int(args['phoneme_num'])
-        text = text.replace("'", "\"")
-        text = json.loads(text)
-        latter_list = main.json_to_obj(text)
-        target = latter_list[latter_num][phoneme_num]
-        model_num = phoneme_list.index(target.phoneme)
-        main.create_sample_image(font, model_num, model_list[font][model_num], sess_list[font][model_num], target.param_list)
-        return "success"
-
-
 api.add_resource(Calligraphy, '/calligraphy')
 api.add_resource(ImageOption, '/calligraphy/image')
 api.add_resource(PhonemeShapeOption, '/calligraphy/shape')
@@ -380,7 +362,6 @@ api.add_resource(PhonemeLocationOption, '/calligraphy/location')
 api.add_resource(PhonemeRotationOption, '/calligraphy/rotation')
 api.add_resource(AddBackGroundImage, '/calligraphy/background')
 api.add_resource(SetLocationInBackground, '/calligraphy/background/location')
-api.add_resource(SampleImage, '/calligraphy/sample')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)

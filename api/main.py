@@ -63,79 +63,82 @@ class Phoneme:
             if self.phoneme_num == 0:
                 self.y += value[2]
             elif self.phoneme_num == 2:
-                self.x += value[3]
+                self.x += value[2]
                 self.y += value[2]
         elif self.shape == 1:
             if self.phoneme_num == 0:
                 self.y += value[0]
             elif self.phoneme_num == 2:
-                self.x += value[3]
+                self.x += value[2]
                 self.y += value[0]
             elif self.phoneme_num == 4:
-                self.x += value[3]
-                self.y += value[5]
+                self.x += value[0]
+                self.y += value[4]
         elif self.shape == 2:
             if self.phoneme_num == 0:
-                pass
+                self.y += value[0]
             elif self.phoneme_num == 2:
-                self.x += value[5]
+                self.x += value[2]
+                self.y += value[0]
             elif self.phoneme_num == 4:
-                self.y += value[5]
+                self.y += value[4]
             elif self.phoneme_num == 5:
-                self.x += value[3]
-                self.y += value[5]
+                self.x += value[2]
+                self.y += value[4]
         elif self.shape == 3:
             if self.phoneme_num == 0:
-                self.y += value[2]
+                self.y += value[1]
             elif self.phoneme_num == 2:
                 self.y += value[4]
         elif self.shape == 4:
             if self.phoneme_num == 0:
-                pass
+                self.y += value[0]
             elif self.phoneme_num == 2:
                 self.y += value[3]
             elif self.phoneme_num == 4:
                 self.y += value[6]
         elif self.shape == 5:
             if self.phoneme_num == 0:
-                pass
+                self.x += value[0]
+                self.y += value[0]
             elif self.phoneme_num == 2:
+                self.x += value[0]
                 self.y += value[3]
             elif self.phoneme_num == 4:
                 self.y += value[6]
             elif self.phoneme_num == 5:
-                self.x += value[3]
+                self.x += value[2]
                 self.y += value[6]
         elif self.shape == 6:
             if self.phoneme_num == 0:
-                self.y += value[3]
+                self.y += value[2]
             elif self.phoneme_num == 2:
                 self.y += value[5]
             elif self.phoneme_num == 3:
-                self.x += value[5]
+                self.x += value[2]
                 self.y += value[3]
         elif self.shape == 7:
             if self.phoneme_num == 0:
                 pass
             elif self.phoneme_num == 2:
-                self.y += value[3]
+                self.y += value[2]
             elif self.phoneme_num == 3:
-                self.x += value[5]
+                self.x += value[2]
             elif self.phoneme_num == 4:
-                self.x += value[5]
-                self.y += value[5]
+                self.x += value[0]
+                self.y += value[4]
         elif self.shape == 8:
             if self.phoneme_num == 0:
                 pass
             elif self.phoneme_num == 2:
-                self.y += value[3]
+                self.y += value[2]
             elif self.phoneme_num == 3:
-                self.x += value[3]
+                self.x += value[2]
             elif self.phoneme_num == 4:
-                self.y += value[6]
+                self.y += value[4]
             elif self.phoneme_num == 5:
-                self.x += value[3]
-                self.y += value[6]
+                self.x += value[2]
+                self.y += value[4]
         elif self.shape == 9:
             if self.phoneme_num == 0:
                 self.y += value[2]
@@ -354,6 +357,10 @@ def json_to_obj(text):
 def create_latter_list(font, text, shape_list):
     # 각 음소간에 좌표를 지정하여 phoneme 인스턴스 생성
     if font == 0:
+        font = 'type6'
+    elif font == 1:
+        font = 'type7'
+    else:
         font = 'type8'
     latter_list = []
     small_list = [3, 4, 5, 15, 16, 17]
@@ -367,15 +374,13 @@ def create_latter_list(font, text, shape_list):
         for idx2, pho in enumerate(latter):
             if text[idx][idx2] != 26:
                 filename = "{}_{}_{}_{}_{}.png".format(font, pho+1, 0, 0.0, 0.0)
-                print("./static/image/{}/{}/{}".format(font, pho+1, filename))
                 img = cv2.imread("./static/image/{}/{}/{}/{}".format(font, pho+1, '0', filename))
-                print(img)
                 img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
                 phoneme = Phoneme(img, shape_list[idx], idx, idx2, x_point, y_point,
                                   [0, 0.0, 0.0], phoneme_list[text[idx][idx2]], img.shape[1], img.shape[0], rotation)
                 phoneme.set_location()
                 phoneme_list2.append(phoneme)
-                param_list = [50] * 4
+                param_list = [0, 0.0, 0.0]
                 json_pho = {
                     "img": img.tolist(),
                     "shape_list": shape_list[idx],
@@ -396,7 +401,7 @@ def create_latter_list(font, text, shape_list):
         if shape_list[idx] in small_list:
             x_point += 64
         else:
-            x_point += 128
+            x_point += 100
         latter_list.append(phoneme_list2)
         json_latter_list.append(json_pho_list)
     return latter_list, json_latter_list
@@ -504,16 +509,18 @@ def img_attach(latter_list, blur_value, color, is_invisiable, ori_text, bg_data,
     now = datetime.now()
     filename = ori_text + now.strftime("%m_%d_%Y_%H_%M_%S.png")
     save_dir = 'static/image/'
+    front_save_dir = '../frontend/public/images/result/'
     result.save(save_dir + filename)
-    com = 's3cmd put ./static/image/{} s3://seolo/static/image/'.format(filename)
-    os.system(com)
+    result.save(front_save_dir + filename)
+    #com = 's3cmd put ./static/image/{} s3://seolo/static/image/'.format(filename)
+    #os.system(com)
 
     cb_filename = ''
     if bg_data:
         bg_file = Image.open(save_dir + bg_data[0])
         cb_filename = combine_bg(result, bg_file, ori_text, bg_data[1], bg_data[2])
-        com = 's3cmd put ./static/image/{} s3://seolo/static/image/'.format(cb_filename)
-        os.system(com)
+        #com = 's3cmd put ./static/image/{} s3://seolo/static/image/'.format(cb_filename)
+        #os.system(com)
 
     return filename, cb_filename, image_width, image_height
 
@@ -568,6 +575,18 @@ def gen_image(text, model, sess, param_list):
         return img
     else:
         return ''
+
+def load_image(font, phoneme, params):
+    if font == 0:
+        font_name = 'type6'
+    elif font == 1:
+        font_name = 'type7'
+    else:
+        font_name = 'type8'
+    filename = "{}_{}_{}_{}_{}.png".format(font_name, phoneme + 1, params[0], params[2]*1.0, params[1]*1.0)
+    img = cv2.imread("./static/image/{}/{}/{}/{}".format(font_name, phoneme+1, params[0], filename))
+    img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+    return img
 
 
 def create_sample_image(font, text, model, sess, param_list):
@@ -722,10 +741,13 @@ def bg_file_save(bg_file, text):
 
 def combine_bg(result, bg_file, text, x=0, y=0):
     save_dir = 'static/image/'
+    front_save_dir = '../frontend/public/images/result/'
     now = datetime.now()
     bg_file.paste(result, (x, y), result)
     filename = "cb_" + text + now.strftime("_%m_%d_%Y_%H_%M_%S.png")
     bg_file.save(save_dir + filename)
+    bg_file.save(front_save_dir + filename)
+
     com = 's3cmd put ./static/image/{} s3://seolo/static/image/'.format(filename)
     os.system(com)
     return filename

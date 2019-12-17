@@ -35,7 +35,7 @@ export default class Main extends React.Component {
             image_width:0,
             image_height:0,
             color:'000000',
-            is_invisiable:false,
+            is_invisiable:true,
             selected_file:null,
             bg_filename:'',
             cb_filename:'',
@@ -43,10 +43,10 @@ export default class Main extends React.Component {
             x_in_bg:0,
             y_in_bg:0,
             real_time:true,
-            sample:[],
             page2:0,
             page3:0,
             page4:0,
+            img_dic:[]
         };
         this.create_image = this.create_image.bind(this);
         this.handleChange = this.handleChange.bind(this);
@@ -64,7 +64,6 @@ export default class Main extends React.Component {
         this.handleImage = this.handleImage.bind(this);
         this.checkboxChange = this.checkboxChange.bind(this);
         this.toggle_real_time = this.toggle_real_time.bind(this);
-        this.get_sample = this.get_sample.bind(this);
         this.set_location_in_bg = this.set_location_in_bg.bind(this);
         this.remove_background = this.remove_background.bind(this);
         this.nextPage = this.nextPage.bind(this);
@@ -108,93 +107,75 @@ export default class Main extends React.Component {
                 console.log(response);
             });
     }
-    get_sample(latter_num, phoneme_num, phoneme){
-        axios.post(domain+'/sample', {
-            latter_list:[this.state.latter_list],
-            font:this.state.font,
-            latter_num: latter_num,
-            phoneme_num: phoneme_num,
-        })
-            .then( response => {
-                const phoneme_list = ['ㄱ', 'ㄴ', 'ㄷ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅅ', 'ㅇ', 'ㅈ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ', 'ㅏ', 'ㅑ', 'ㅔ', 'ㅐ', 'ㅓ', 'ㅕ', 'ㅣ', 'ㅗ', 'ㅛ', 'ㅜ', 'ㅠ', 'ㅡ', ' ', '\n']
-
-                let params = this.state.latter_list[latter_num][phoneme_num].params;
-                let sample = [];
-                let phoneme_num2 = 0;
-                let tmp = 0;
-                let filename = '';
-                const s3_path = 'http://seolo.s3-website.ap-northeast-2.amazonaws.com/static/image/sample/';
-                for(let i=0;i<4;i++){
-                    for(let j=0;j<101;j+=100){
-                        phoneme_num2 = phoneme_list.indexOf(phoneme);
-                        tmp = params[i];
-                        params[i] = j;
-                        filename = this.state.font + "_" + phoneme_num2 + "_" + params[0] + "_" + params[1] + "_" + params[2] + "_" + params[3] + ".png";
-                        sample.push(s3_path + filename);
-                        params[i] = tmp;
-                    }
+    set_image(phoneme){
+        const phoneme_list = ['', 'ㄱ', 'ㄴ', 'ㄷ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅅ', 'ㅇ', 'ㅈ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ', 'ㅏ', 'ㅑ', 'ㅔ', 'ㅐ'
+                        , 'ㅓ', 'ㅕ', 'ㅣ', 'ㅗ', 'ㅛ', 'ㅜ', 'ㅠ', 'ㅡ', ' ', '\n']
+        this.state.img_dic = [];
+        let font_name = '';
+        if(this.state.font == 0){
+            font_name = 'type6';
+        }
+        else if(this.state.font == 1){
+            font_name = 'type7';
+        }
+        else{
+            font_name = 'type8';
+        }
+        let tmp = [];
+        let tmp2 = [];
+        const dir = "/images/"+ font_name + "/" + phoneme_list.indexOf(phoneme);
+        for(let shape=0;shape<5;shape++){
+            tmp2 = []
+            for(let i=-1;i<1.1;i+=0.5){
+                tmp = [];
+                for(let j=-1;j<1.1;j+=0.5){
+                    tmp.push(dir + "/" + String(shape) + "/" + font_name + "_" + phoneme_list.indexOf(phoneme) + "_" + String(shape) + "_"
+                    + String(j.toFixed(1)) + "_" + String(i.toFixed(1)) + ".png");
                 }
-                this.setState({
-                    is_loading:false,
-                    sample:sample
-                })
-            })
-            .catch( response => {
-                this.setState({
-                    is_loading:false                    
-                })
-                console.log(response);
-            });
+                tmp2.push(tmp);
+            }
+            this.state.img_dic.push(tmp2);
+        }
     }
+   
     select_phoneme(latter_num, phoneme_num, phoneme){
 
         this.setState({
-            is_loading:true,
             selected_latter:latter_num,
             selected_phoneme:phoneme_num,
             selected_phoneme2:phoneme
         })
-        this.get_sample(latter_num, phoneme_num, phoneme);
+        this.set_image(phoneme);
     }
 
     change_value(e){
         let target = this.state.latter_list[this.state.selected_latter][this.state.selected_phoneme];
-        if(e.target.name.slice(0,1) === 'p'){
-            let idx = 0;
-            if(e.target.name === 'p1') idx = 0;
-            else if(e.target.name === 'p2') idx=1;
-            else if(e.target.name === 'p3') idx=2;
-            else if(e.target.name === 'p4') idx=3;
-            target.params[idx] = e.target.value;
+
+        if(e.target.name === 'width') {
+            target.width = e.target.value;
+            this.setState({latter_list: update(this.state.latter_list, 
+                {[this.state.selected_latter]:{[this.state.selected_phoneme]:{$set: target}}})})
+        } else if(e.target.name === 'height'){
+            target.height = e.target.value;
+            this.setState({latter_list: update(this.state.latter_list, 
+                {[this.state.selected_latter]:{[this.state.selected_phoneme]:{$set: target}}})})
+        } else if(e.target.name === 'rotation'){
+            target.rotation = e.target.value;
             this.setState({latter_list: update(this.state.latter_list, 
                 {[this.state.selected_latter]:{[this.state.selected_phoneme]:{$set: target}}})})
         }
         else{
-            if(e.target.name === 'width') {
-                target.width = e.target.value;
+            if(e.target.name === 'y') {
+                target.y = e.target.value*=1;
                 this.setState({latter_list: update(this.state.latter_list, 
                     {[this.state.selected_latter]:{[this.state.selected_phoneme]:{$set: target}}})})
-            } else if(e.target.name === 'height'){
-                target.height = e.target.value;
+            }else if(e.target.name === 'x') {
+                target.x = e.target.value*=1;
                 this.setState({latter_list: update(this.state.latter_list, 
                     {[this.state.selected_latter]:{[this.state.selected_phoneme]:{$set: target}}})})
-            } else if(e.target.name === 'rotation'){
-                target.rotation = e.target.value;
-                this.setState({latter_list: update(this.state.latter_list, 
-                    {[this.state.selected_latter]:{[this.state.selected_phoneme]:{$set: target}}})})
-            }
-            else{
-                if(e.target.name === 'y') {
-                    target.y = e.target.value*=1;
-                    this.setState({latter_list: update(this.state.latter_list, 
-                        {[this.state.selected_latter]:{[this.state.selected_phoneme]:{$set: target}}})})
-                }else if(e.target.name === 'x') {
-                    target.x = e.target.value*=1;
-                    this.setState({latter_list: update(this.state.latter_list, 
-                        {[this.state.selected_latter]:{[this.state.selected_phoneme]:{$set: target}}})})
-                }
             }
         }
+        
     }
 
     handleChange(e){
@@ -291,7 +272,6 @@ export default class Main extends React.Component {
                     cb_filename:response.data.cb_filename,
                     latter_list:response.data.latter_list,
                 })
-                this.get_sample(this.state.selected_latter, this.state.selected_phoneme, this.state.selected_phoneme2);
             })
             .catch( response => {
                 this.setState({
@@ -301,7 +281,11 @@ export default class Main extends React.Component {
             });    
     }
 
-    update_phoneme_shape(){
+    update_phoneme_shape(shape, i, j){
+        let target = this.state.latter_list[this.state.selected_latter][this.state.selected_phoneme];
+        target.params = [shape, i, j];
+        this.setState({latter_list: update(this.state.latter_list, 
+            {[this.state.selected_latter]:{[this.state.selected_phoneme]:{$set: target}}})})
         if(!this.state.real_time)
             return;
         this.setState({
@@ -328,8 +312,8 @@ export default class Main extends React.Component {
                     filename:response.data.filename,
                     cb_filename:response.data.cb_filename,
                     latter_list:response.data.latter_list,
+                    is_loading:false
                 })
-                this.get_sample(this.state.selected_latter, this.state.selected_phoneme, this.state.selected_phoneme2);
             })
             .catch( response => {
                 this.setState({
@@ -693,7 +677,7 @@ export default class Main extends React.Component {
                     change_value={this.change_value}
                     style={div_style}
                     real_time={this.state.real_time}
-                    sample={this.state.sample}
+                    img_dic={this.state.img_dic}
                     />}
                     </div>
             </li>
@@ -756,8 +740,8 @@ export default class Main extends React.Component {
                         />
                     </div>
                     <div class="text-center">
-                        <button className="white bmp-to-vector" onClick={this.toVector}>Bitmap to Vector</button><br/>
-                        <label class="fs-field-label fs-anim-upper" data-info="We'll make sure to use it all over">이미지를 부드럽게 만들어 줍니다.</label>
+                        <button className="white bmp-to-vector" onClick={this.toVector}>완성입니다!</button><br/>
+                        <label class="fs-field-label fs-anim-upper" data-info="We'll make sure to use it all over"></label>
                     </div>
                     
                 </li>
@@ -777,7 +761,7 @@ export default class Main extends React.Component {
                         <div className="fs-fields">{fs_li}</div>
                     </div>
         const fs_title = <div className="fs-title">
-                            <h1>서로</h1>
+                            <h1>하임</h1>
                             <div className="codrops-top">
                                 <a className="codrops-icon codrops-icon-prev" href="http://tympanus.net/Development/NotificationStyles/"><span>Previous Demo</span></a>
                                 <a className="codrops-icon codrops-icon-drop" href="http://tympanus.net/codrops/?p=19520"><span>Back to the Codrops Article</span></a>

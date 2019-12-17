@@ -7,7 +7,9 @@ export default class ShowImage extends React.Component {
         if(this.props.cb_filename){
             filename = this.props.cb_filename;
         }
-        const img_dir = 'http://seolo.s3-website.ap-northeast-2.amazonaws.com/static/image/'+filename;
+        //const img_dir = 'http://seolo.s3-website.ap-northeast-2.amazonaws.com/static/image/'+filename;
+        const img_dir = '/images/result/'+filename;
+
         const image = (
                 <img src={img_dir} className="image_style" alt=""/>
         )

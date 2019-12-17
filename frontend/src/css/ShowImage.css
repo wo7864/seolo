@@ -10,10 +10,11 @@
 .image-div{
     min-width:300px;
     min-height:300px;
-    background: #76788b7a;
+    background: #ffffff;
     text-align: center;
     padding-top:48px;
     padding-bottom:48px;
+    border-radius:5px;
 }
 
 .image-div>a{
