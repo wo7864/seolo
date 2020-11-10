@@ -1,0 +1,105 @@
+.header-div{
+    padding:50px 140px 50px 140px;
+    font-size:40px;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-weight: bold;
+    color:#333;
+}
+
+.container{
+
+    position: relative;
+    padding: 0px 140px;
+    padding-top:20px;
+
+    overflow: hidden;
+}
+.sub-container{
+    float: left;
+
+    width:50%;
+    height:730px;
+    display:flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.left-container{
+    align-items: flex-start;
+
+}
+.font-div{
+}
+.font-image{
+    width:240px;
+    height:160px;
+    opacity: 0.5;
+    -webkit-transition:scale 1s;
+    transition:all ease 0.5s;
+}
+.font-image:hover{
+    opacity: 0.9;
+    transform:scale(1.1);
+}
+.focus-font{
+    opacity: 0.9;
+    transform:scale(1.1);
+}
+.font-preview{
+    width:100px;
+    height:50px;
+
+    margin-left:60px;
+
+    border:2px solid #888;
+    border-radius: 20px;
+    background-color: #fafafa;
+
+    font-family: '제주고딕OTF', sans-serif;
+    font-size: 15px;
+    color:#888;
+
+}
+.right-container{
+    
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: space-between;
+}
+
+.input-text{
+
+    width:80%;
+    height:60px;
+    margin-top:auto;
+    margin-bottom:auto;
+    text-align: right;
+    border:0;
+    border-bottom: 4px solid #ccc;
+
+
+    font-family: '제주고딕OTF', sans-serif;
+    font-size:60px;
+    color:#333;
+
+
+}
+.input-text:focus {
+    border:0;
+    border-bottom: 4px solid #ccc;
+    outline:none;
+
+}
+
+.submit-button{
+
+    width:250px;
+    height:50px;
+
+    border:2px solid #888;
+    border-radius: 20px;
+    background-color: #fafafa;
+
+    font-family: '제주고딕OTF', sans-serif;
+    font-size: 15px;
+    color:#888;
+}

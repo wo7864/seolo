@@ -321,38 +321,13 @@ def add_image(paper, image, width_point, height_point):
                 paper[y, x] = image[idx_i, idx_j]
     return paper
 
-
-def set_definition(result, definition=90):
-    definition = definition / 200
-    # definition: 0~1
-    for idx, i in enumerate(result):
-        for idx2, j in enumerate(i):
-            if j > 1-definition:
-                result[idx][idx2] = 1
-            elif j <= definition:
-                result[idx][idx2] = 0
-    return result
-
-
+# 배열값을 모두 0에서 1까지로 평준화 시키는 함수
 def normalization(result):
     min_value = np.min(result)
     result = result[:] - min_value
     max_value = np.max(result)
     result = result[:] / max_value
     return result
-
-
-def json_to_obj(text):
-    latter_list = []
-    for latter in text:
-        phoneme_list2 = []
-        for phoneme in latter:
-            phoneme_list2.append(Phoneme(np.array(phoneme['img']), phoneme['shape_list'], phoneme['latter_num'],
-                                 phoneme['phoneme_num'], phoneme['x'], phoneme['y'], phoneme['params'],
-                                 phoneme['phoneme'], phoneme['width'], phoneme['height'], phoneme['rotation']))
-        latter_list.append(phoneme_list2)
-    return latter_list
-
 
 def create_latter_list(font, text, shape_list):
     # 각 음소간에 좌표를 지정하여 phoneme 인스턴스 생성
@@ -518,33 +493,11 @@ def img_attach(latter_list, blur_value, color, is_invisiable, ori_text, bg_data,
     cb_filename = ''
     if bg_data:
         bg_file = Image.open(save_dir + bg_data[0])
-        cb_filename = combine_bg(result, bg_file, ori_text, bg_data[1], bg_data[2])
+        #cb_filename = combine_bg(result, bg_file, ori_text, bg_data[1], bg_data[2])
         #com = 's3cmd put ./static/image/{} s3://seolo/static/image/'.format(cb_filename)
         #os.system(com)
 
     return filename, cb_filename, image_width, image_height
-
-
-def blur(img, limit=0.5):
-    width = img.shape[1]
-    height = img.shape[0]
-    tmp = np.full((1, width), 1)
-    tmp2 = np.full((height+2, 1), 1)
-    img = np.vstack([img, tmp])
-    img = np.vstack([tmp, img])
-    img = np.hstack([img, tmp2])
-    img = np.hstack([tmp2, img])
-    update_list = []
-    for x in range(1, width+1):
-        for y in range(1, height+1):
-            value = img[y-1][x-1] + img[y][x-1] + img[y+1][x-1] + img[y-1][x] + img[y+1][x] + img[y-1][x+1] + \
-                    img[y][x+1] + img[y+1][x+1]
-            value /= 8
-            if limit < value:
-                update_list.append((x, y, value))
-    for i in update_list:
-        img[i[1]][i[0]] = limit+0.1
-    return img
 
 
 def gen_image(text, model, sess, param_list):
@@ -570,88 +523,10 @@ def gen_image(text, model, sess, param_list):
         img = np.hstack([img, tmp2])
         img = np.hstack([tmp2, img])
 
-        img = blur(img)
-        img = set_definition(img)
+        #img = set_definition(img)
         return img
     else:
         return ''
-
-def load_image(font, phoneme, params):
-    if font == 0:
-        font_name = 'type6'
-    elif font == 1:
-        font_name = 'type7'
-    else:
-        font_name = 'type8'
-    filename = "{}_{}_{}_{}_{}.png".format(font_name, phoneme + 1, params[0], params[2]*1.0, params[1]*1.0)
-    img = cv2.imread("./static/image/{}/{}/{}/{}".format(font_name, phoneme+1, params[0], filename))
-    img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
-    return img
-
-
-def create_sample_image(font, text, model, sess, param_list):
-    file_list = []
-    for i in range(4):
-        for j in range(0, 101, 100):
-            tmp = param_list[i]
-            param_list[i] = j
-            filename = '{}_{}_{}_{}_{}_{}.png'.format(font, text, param_list[0], param_list[1], param_list[2], param_list[3])
-            save_dir = 'static/image/sample/'
-            f = save_dir + filename
-            if not os.path.isfile(f):
-                img = gen_image(text, model, sess, param_list)
-                img = img[:] * 255
-                img = img.astype(np.uint8)
-                img = Image.fromarray(img, 'L')
-                img.save(f)
-                file_list.append(f)
-            param_list[i] = tmp
-    com = 's3cmd put '
-    for f in file_list:
-        com += f
-        com += ' '
-    com += 's3://seolo/static/image/sample/'
-    print(com)
-    os.system(com)
-    return 0
-
-
-def update_rotation(img2, rotation):
-    img2 = img2.astype(np.uint8)
-    matrix = cv2.getRotationMatrix2D((img2.shape[1]/2, img2.shape[0]/2), int(rotation)*-1, 1)
-    img2 = cv2.warpAffine(img2, matrix, (img2.shape[1], img2.shape[0]),  borderMode=cv2.BORDER_REPLICATE)
-    return img2
-
-
-def create_one_image(phoneme, model, sess):
-
-    noise = np.full((1, 50), phoneme.param_list[0])
-    params = phoneme.param_list[1:]
-    noise = np.tile(noise, [1, 1])
-    latent_code = np.zeros([1, 3])
-    for idx, param in enumerate(params):
-        latent_code[:, idx] = (int(param)/50) - 1
-
-    generated = sess.run(model.Gen, {
-        model.noise_source: noise, model.latent_code: latent_code, model.is_train: False
-    })
-    img = np.reshape(generated, (model.height, model.width))  # 이미지 형태로. #num_generate, height, width
-    print(img)
-    img = normalization(img)
-    print(img)
-    width = int(img.shape[1] / 4)
-    height = int(img.shape[0] / 4)
-    tmp = np.full((width, width * 4), 1)
-    tmp2 = np.full((height * 4 + (width * 2), height), 1)
-    img = np.vstack([img, tmp])
-    img = np.vstack([tmp, img])
-    img = np.hstack([img, tmp2])
-    img = np.hstack([tmp2, img])
-
-    #img = blur(img)
-    #img = set_definition(img)
-    return img
-
 
 # 현재 불필요한 반복작업이 있음. 개선 필요
 def convert_text(korean_word):
@@ -728,26 +603,3 @@ def convert_text(korean_word):
         for idx2, j in enumerate(i):
             r_lst[idx][idx2] = phoneme_list.index(j)
     return r_lst, shape_list
-
-
-def bg_file_save(bg_file, text):
-    save_dir = 'static/image/'
-    now = datetime.now()
-    filename = 'bg_' + text + now.strftime("_%m_%d_%Y_%H_%M_%S.png")
-    background_image = Image.open(bg_file)
-    background_image.save(save_dir + filename)
-    return filename
-
-
-def combine_bg(result, bg_file, text, x=0, y=0):
-    save_dir = 'static/image/'
-    front_save_dir = '../frontend/public/images/result/'
-    now = datetime.now()
-    bg_file.paste(result, (x, y), result)
-    filename = "cb_" + text + now.strftime("_%m_%d_%Y_%H_%M_%S.png")
-    bg_file.save(save_dir + filename)
-    bg_file.save(front_save_dir + filename)
-
-    com = 's3cmd put ./static/image/{} s3://seolo/static/image/'.format(filename)
-    os.system(com)
-    return filename

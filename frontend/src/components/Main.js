@@ -761,7 +761,7 @@ export default class Main extends React.Component {
                         <div className="fs-fields">{fs_li}</div>
                     </div>
         const fs_title = <div className="fs-title">
-                            <h1>하임</h1>
+                            <h1>서로</h1>
                             <div className="codrops-top">
                                 <a className="codrops-icon codrops-icon-prev" href="http://tympanus.net/Development/NotificationStyles/"><span>Previous Demo</span></a>
                                 <a className="codrops-icon codrops-icon-drop" href="http://tympanus.net/codrops/?p=19520"><span>Back to the Codrops Article</span></a>
